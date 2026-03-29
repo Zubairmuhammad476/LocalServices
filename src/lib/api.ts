@@ -10,12 +10,24 @@ import type {
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
-  withCredentials: true, // Required for Sanctum cookie auth
+  // withCredentials omitted — we use Bearer token auth, not Sanctum cookie sessions
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
     "X-Requested-With": "XMLHttpRequest",
   },
+});
+
+// ─── Request Interceptor — always inject Bearer token from localStorage ───────
+
+apiClient.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+  return config;
 });
 
 // ─── Response Interceptors ────────────────────────────────────────────────────

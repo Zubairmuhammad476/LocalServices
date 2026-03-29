@@ -86,7 +86,7 @@ export default function MainServiceLayout({ service, breadcrumbs }: Props) {
             {service.children.map((child) => (
               <li key={child.id}>
                 <Link
-                  href={`/services/${child.slug}`}
+                  href={`/${child.slug}`}
                   className="group flex items-center gap-3 rounded-xl border border-white/10 bg-surface-raised p-4 shadow-glass transition-all duration-200 hover:border-brand-400/50 hover:shadow-glow"
                 >
                   <span className="text-fluid-body font-medium text-white group-hover:text-brand-300 transition-colors">

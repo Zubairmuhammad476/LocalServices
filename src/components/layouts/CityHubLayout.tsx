@@ -69,7 +69,7 @@ export default function CityHubLayout({ service, breadcrumbs }: Props) {
             {service.children.map((child) => (
               <li key={child.id}>
                 <Link
-                  href={`/services/${child.slug}`}
+                  href={`/${child.slug}`}
                   className="group flex flex-col gap-2 rounded-xl border border-white/10 bg-surface-raised p-5 shadow-glass transition-all duration-300 hover:border-brand-400/60 hover:shadow-glow hover:-translate-y-1"
                 >
                   <h3 className="text-fluid-body font-semibold text-white group-hover:text-brand-300 transition-colors">

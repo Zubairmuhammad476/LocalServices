@@ -1,0 +1,52 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+⚠ Port 3000 is in use by process 8144, using available port 3001 instead.
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.1.3:3001
+- Environments: .env.local
+✓ Ready in 1495ms
+
+○ Compiling /[service] ...
+ GET /dubai 200 in 8.5s (next.js: 7.1s, application-code: 1386ms)
+ GET /home-cleaning/deep-cleaning-dubai 404 in 2.9s (next.js: 1505ms, application-code: 1347ms)
+ GET /home-cleaning/deep-cleaning-dubai 404 in 1010ms (next.js: 156ms, application-code: 853ms)
+ GET /dubai 404 in 1979ms (next.js: 1621ms, application-code: 358ms)
+ GET /dubai 404 in 678ms (next.js: 14ms, application-code: 664ms)
+ GET /dubai 404 in 137ms (next.js: 9ms, application-code: 127ms)
+ GET /dubai 404 in 562ms (next.js: 252ms, application-code: 310ms)
+ GET /dubai 404 in 568ms (next.js: 219ms, application-code: 348ms)
+ GET /dubai 404 in 561ms (next.js: 301ms, application-code: 260ms)
+ GET /dubai 404 in 642ms (next.js: 44ms, application-code: 599ms)
+ GET /dubai 404 in 606ms (next.js: 232ms, application-code: 374ms)
+ GET /dubai 404 in 403ms (next.js: 17ms, application-code: 387ms)
+ GET /dubai 404 in 153ms (next.js: 111ms, application-code: 42ms)
+ GET /dubai 404 in 166ms (next.js: 71ms, application-code: 95ms)
+ GET /dubai 404 in 169ms (next.js: 22ms, application-code: 147ms)
+ GET /dubai 404 in 502ms (next.js: 78ms, application-code: 424ms)
+✓ Compiled in 391ms
+○ Compiling /services/[[...slug]] ...
+ GET /services/dubai/cleaning 404 in 5.3s (next.js: 4.2s, application-code: 1076ms)
+ GET / 200 in 1519ms (next.js: 899ms, application-code: 620ms)
+ GET /services/home-cleaning 200 in 698ms (next.js: 18ms, application-code: 681ms)
+ GET /services/dubai 404 in 718ms (next.js: 27ms, application-code: 691ms)
+ GET /contact 200 in 1033ms (next.js: 992ms, application-code: 40ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://D:/LocalServices ae/frontend/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2431:13)
+ GET /services/dubai 200 in 573ms (next.js: 69ms, application-code: 504ms)
+ GET /services/dubai/cleaning 200 in 2.3s (next.js: 19ms, application-code: 2.3s)
+ GET /services/dubai/cleaning/home 200 in 914ms (next.js: 18ms, application-code: 897ms)
+ GET /services/dubai/cleaning 200 in 649ms (next.js: 60ms, application-code: 590ms)
+ GET /services/dubai/cleaning/home 200 in 399ms (next.js: 15ms, application-code: 384ms)
+ GET /services/dubai/cleaning 200 in 468ms (next.js: 23ms, application-code: 445ms)
+ GET /services/dubai/cleaning/home 200 in 303ms (next.js: 17ms, application-code: 285ms)
+ GET /services/dubai/cleaning/services/dubai/cleaning/holiday-home 404 in 1086ms (next.js: 31ms, application-code: 1056ms)
+ GET /about 200 in 1163ms (next.js: 848ms, application-code: 316ms)
+ GET /services/dubai 200 in 1103ms (next.js: 37ms, application-code: 1066ms)
+ GET /services/dubai 200 in 432ms (next.js: 26ms, application-code: 406ms)
+ GET /ajman 404 in 126ms (next.js: 58ms, application-code: 68ms)
+ GET /ajman 404 in 87ms (next.js: 22ms, application-code: 64ms)
+ GET /services/dubai/services/dubai/landscaping 200 in 804ms (next.js: 18ms, application-code: 786ms)
+ GET /services/dubailandscaping 404 in 829ms (next.js: 17ms, application-code: 812ms)
+ GET /services/dubai/landscaping 200 in 894ms (next.js: 21ms, application-code: 873ms)
