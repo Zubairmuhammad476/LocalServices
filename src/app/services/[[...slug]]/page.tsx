@@ -13,6 +13,7 @@ import {
   fetchTopSlugs,
   serviceCanonical,
 } from '@/lib/server/fetchService';
+import { generateSeoMetadata } from '@/lib/seo';
 
 import ServicePageTemplate from '@/components/templates/ServicePageTemplate';
 import SubServiceTemplate from '@/components/templates/SubServiceTemplate';
@@ -44,7 +45,7 @@ export async function generateStaticParams() {
   }
 }
 
-// ─── Dynamic Metadata ─────────────────────────────────────────────────────────
+// ─── Dynamic Metadata (Koray Formula) ────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const p = await params;
   const slugArray = p.slug || [];
@@ -53,19 +54,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const svc = await fetchServiceBySlug(fullSlug);
   if (!svc) return { title: 'Service Not Found' };
 
-  const title = svc.seo_title ?? `${svc.name} in UAE | LocalServices AE`;
-  const description = svc.seo_description ?? `Professional ${svc.name} services in the UAE. Vetted experts, transparent pricing.`;
+  // Derive location from slug (e.g. services/dubai/cleaning → Dubai)
+  const locationSlug = slugArray[0] ?? 'uae';
+  const location = locationSlug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+  // Koray title: [Entity] in [Location] | [Numeric] | LocalServices AE
+  const entityName = svc.seo_title
+    ? svc.seo_title.split(' in ')[0]
+    : svc.name;
+  const korayTitle = `${entityName} in ${location} | 3,619+ Verified Pros | LocalServices AE`
+    .substring(0, 60);
+
+  // Koray description: Factual + action-first "if" + CTA (max 160 chars)
+  const korayDesc = (
+    svc.seo_description ||
+    `${entityName} services in ${location} are delivered by verified professionals. ` +
+    `Booking confirmation occurs in under 120 seconds, if the user completes the AED checkout. Book now.`
+  ).substring(0, 160);
+
+  // Alt-text formula for OG image
+  const imageAlt = svc.image_alt_text ||
+    `Verified ${entityName} specialist performing home services for a residential property in ${location}, UAE`;
 
   return {
-    title,
-    description,
+    title: korayTitle,
+    description: korayDesc,
     alternates: { canonical: serviceCanonical(fullSlug) },
     openGraph: {
-      title,
-      description,
+      title: korayTitle,
+      description: korayDesc,
       url: serviceCanonical(fullSlug),
       type: 'website',
-      images: svc.image_url ? [{ url: svc.image_url }] : undefined,
+      images: svc.image_url
+        ? [{ url: svc.image_url, width: 1200, height: 630, alt: imageAlt }]
+        : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: korayTitle,
+      description: korayDesc,
     },
   };
 }

@@ -19,6 +19,10 @@ export interface ServiceData {
   seo_title: string | null;
   seo_description: string | null;
   image_url: string | null;
+  image_alt_text?: string | null;   // Koray alt-tag field
+  canonical_url?: string | null;    // Custom canonical override
+  no_index?: boolean;               // noindex directive
+  h1_override?: string | null;      // Custom H1 text
   schema_markup: Record<string, unknown> | null;
   is_active: boolean;
   is_seo_optimized: boolean;

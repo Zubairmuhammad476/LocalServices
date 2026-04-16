@@ -1,6 +1,10 @@
 "use client";
 
-import type { Metadata } from "next";
+// Koray SEO Metadata (implement in server wrapper when needed):
+// Title: Contact LocalServices AE in UAE | 2-Hour Response | LocalServices AE
+// Desc: LocalServices AE support responds to all contact requests within 2 business hours.
+//       Resolution occurs within 4 hours, if the user submits a complete booking reference.
+
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 
@@ -72,11 +76,11 @@ export default function ContactPage() {
           <span className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-900/20 px-4 py-1.5 text-xs font-medium text-blue-300">
             💬 We reply within 2 hours (Sun–Thu)
           </span>
-          <h1 className="mt-6 text-4xl font-extrabold text-white sm:text-5xl">
-            Get in Touch
+          <h1 className="mt-6 text-4xl font-extrabold text-white sm:text-5xl font-display">
+            LocalServices AE Support Responds Within 2 Hours
           </h1>
           <p className="mt-4 text-lg text-slate-300">
-            Whether you're a customer, provider, or partner — our team is here to help across all UAE emirates.
+            <strong>Support requests, including booking disputes and provider applications,</strong> receive responses within 2 business hours (Sunday–Thursday). Resolution occurs within 4 hours, if the user submits a complete booking reference.
           </p>
         </div>
       </section>

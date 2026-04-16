@@ -1,0 +1,27 @@
+﻿# LocalServices AE
+
+> UAE's premier local services marketplace connecting residents with trusted providers across all 7 emirates.
+
+## About
+LocalServices AE is a B2C marketplace for home, professional, and lifestyle service bookings in the UAE.
+
+## Core Services
+- Home Maintenance & Repairs
+- Cleaning & Sanitization  
+- Electrical & Plumbing
+- Moving & Relocation
+- Beauty & Wellness
+- Photography & Events
+- Pest Control
+- Car Services
+
+## Coverage
+All 7 UAE emirates: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain
+
+## API
+Data available via REST API. Contact: hello@localservices.ae
+
+## Key Pages
+- [Home](http://localhost:3000)
+- [Services](http://localhost:3000/services)
+- [About](http://localhost:3000/about)

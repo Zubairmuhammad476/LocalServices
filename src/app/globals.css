@@ -437,3 +437,371 @@
   font-size: 0.75rem;
   font-weight: 500;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   BRAND DESIGN SYSTEM V2 — LocalServices AE Homepage
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --brand: #0062FF;
+  --brand-dark: #0047CC;
+  --deep-navy: #081226;
+  --ghost-white: #F9FBFF;
+  --soft-slate: #F1F5F9;
+  --text-dark: #0F1923;
+  --text-muted: #64748B;
+  --border-light: #E2E8F0;
+  --font-display: var(--font-jakarta, "Plus Jakarta Sans"), system-ui, sans-serif;
+  --font-body: var(--font-inter, "Inter"), system-ui, sans-serif;
+}
+
+.section-ghost { background-color: var(--ghost-white); }
+.section-slate { background-color: var(--soft-slate); }
+.section-navy  { background-color: var(--deep-navy); }
+.section-brand { background-color: var(--brand); }
+.font-display  { font-family: var(--font-display); }
+.font-body     { font-family: var(--font-body); }
+
+/* ─── Advanced Service Card ─────────────────────────────────────────────────── */
+.service-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              border-color 0.3s ease,
+              box-shadow 0.35s ease;
+  cursor: pointer;
+}
+.service-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--brand);
+  box-shadow: 0 20px 40px -10px rgba(0,98,255,0.15);
+}
+.service-card .card-icon {
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.service-card:hover .card-icon { transform: scale(1.1); }
+
+/* ─── Emirate Card ──────────────────────────────────────────────────────────── */
+.emirate-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.35s ease, border-color 0.3s ease;
+}
+.emirate-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,98,255,0.2);
+  border-color: var(--brand);
+}
+@keyframes iconPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
+  100% { transform: scale(1.1); }
+}
+.emirate-card:hover .emirate-icon { animation: iconPulse 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* ─── Blog Card ─────────────────────────────────────────────────────────────── */
+.blog-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+              border-color 0.3s ease, box-shadow 0.35s ease;
+}
+.blog-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--brand);
+  box-shadow: 0 20px 40px -10px rgba(0,98,255,0.12);
+}
+.blog-card .blog-img-wrap { overflow: hidden; }
+.blog-card .blog-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transform: scale(1.1);
+  transition: transform 0.5s ease;
+  display: block;
+}
+.blog-card:hover .blog-img { transform: scale(1); }
+
+/* ─── Safety Card ────────────────────────────────────────────────────────────── */
+.safety-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--brand);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.safety-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,98,255,0.1);
+}
+
+/* ─── Bento Card ─────────────────────────────────────────────────────────────── */
+.bento-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.bento-card:hover {
+  box-shadow: 0 12px 32px rgba(0,98,255,0.1);
+  transform: translateY(-4px);
+}
+
+/* ─── Infinite Trust Marquee ────────────────────────────────────────────────── */
+.marquee-wrapper {
+  overflow: hidden;
+  width: 100%;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+.marquee-track {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.trust-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  filter: grayscale(1) opacity(0.45);
+  transition: filter 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 0.75rem;
+}
+.trust-logo:hover {
+  filter: grayscale(0) opacity(1);
+  transform: scale(1.1);
+}
+
+/* ─── FAQ Accordion ──────────────────────────────────────────────────────────── */
+.faq-item {
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.faq-item[open] {
+  border-color: var(--brand);
+  box-shadow: 0 4px 16px rgba(0,98,255,0.08);
+}
+.faq-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-family: var(--font-display);
+  user-select: none;
+}
+.faq-summary::-webkit-details-marker { display: none; }
+.faq-chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  color: var(--brand);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+details[open] .faq-chevron { transform: rotate(180deg); }
+.faq-body {
+  padding: 0 1.5rem 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+
+/* ─── WhatsApp Floating Widget ──────────────────────────────────────────────── */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #25D366;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+  animation: waPulse 2.5s ease-in-out infinite;
+}
+.whatsapp-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 28px rgba(37,211,102,0.6);
+  animation: none;
+}
+@keyframes waPulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,0.4); }
+  50%      { box-shadow: 0 4px 32px rgba(37,211,102,0.7), 0 0 0 8px rgba(37,211,102,0.1); }
+}
+.whatsapp-tooltip {
+  position: absolute;
+  right: calc(100% + 0.75rem);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text-dark);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.whatsapp-btn:hover .whatsapp-tooltip { opacity: 1; }
+
+/* ─── CTA Ripple ─────────────────────────────────────────────────────────────── */
+@keyframes ripplePulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+  70%  { box-shadow: 0 0 0 16px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+.btn-ripple { animation: ripplePulse 5s ease-out infinite; }
+
+/* ─── Section Typography ─────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.section-h2-dark { font-family: var(--font-display); font-weight: 800; color: var(--text-dark); line-height: 1.1; }
+.section-h2-light { font-family: var(--font-display); font-weight: 800; color: #ffffff; line-height: 1.1; }
+.text-fluid-hero { font-size: clamp(2.25rem, 5.5vw, 4.5rem); }
+.text-fluid-h2   { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+.text-fluid-body { font-size: clamp(1rem, 1.5vw, 1.125rem); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeUp 0.65s ease both; }
+.animate-fade-up { animation: fadeUp 0.75s ease both; }
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+.anim-delay-4 { animation-delay: 0.45s; }
+
+/* ─── Select/Option contrast fix (dropdowns on dark bg) ─────────────────────── */
+select option {
+  background-color: #0d1a3a;
+  color: #ffffff;
+}
+/* Light-bg selects (hero form glassmorphism) */
+.select-light option {
+  background-color: #1e2d50;
+  color: #ffffff;
+}
+
+/* ─── Body default font system ───────────────────────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  background-color: var(--deep-navy);
+  color: #f1f5f9;
+}
+
+/* ─── Testimonial Carousel ───────────────────────────────────────────────────── */
+.testimonial-track {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+.testimonial-track::-webkit-scrollbar { display: none; }
+
+.testimonial-slide {
+  flex: 0 0 min(100%, 340px);
+  scroll-snap-align: start;
+}
+
+.testimonial-slide--active .bento-card {
+  opacity: 1;
+  filter: none;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,98,255,0.1);
+}
+
+.testimonial-slide--inactive .bento-card {
+  opacity: 0.45;
+  filter: blur(1.5px);
+}
+
+/* ─── Admin Portal & Auth Pages — Brand Typography System ───────────────────── */
+/* Applies Plus Jakarta Sans headings and Inter body to all portal/auth pages */
+
+/* Auth pages logo */
+.text-2xl.font-display,
+.text-2xl.font-bold.font-display {
+  font-family: var(--font-display) !important;
+}
+
+/* Admin dashboard headings */
+.admin-heading {
+  font-family: var(--font-display) !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Universal heading tag overrides — apply Jakarta Sans globally */
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+/* Admin stat card value */
+.stat-card p.text-3xl,
+.stat-card p.text-2xl {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* Admin panel section headers */
+header h1, header p.text-sm.font-bold {
+  font-family: var(--font-display);
+}
+
+/* Footer */
+footer {
+  font-family: var(--font-body);
+}
+
+/* All body text */
+p, li, td, th, label, input, select, textarea, button, a {
+  font-family: var(--font-body);
+}

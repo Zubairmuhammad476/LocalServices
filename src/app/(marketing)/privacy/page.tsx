@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { generateSeoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy — LocalServices AE",
-  description:
-    "Read LocalServices AE's privacy policy. We are committed to protecting your personal data and complying with UAE data protection laws.",
-};
+export const metadata: Metadata = generateSeoMetadata({
+  entity: "Privacy Policy — LocalServices AE",
+  location: "UAE",
+  numericValue: "PDPL Compliant",
+  factStatement: "LocalServices AE collects personal data in compliance with UAE Personal Data Protection Law (PDPL) and international GDPR standards.",
+  ifStatement: "Data deletion requests are processed within 30 calendar days, if the user submits a verified request via the account portal.",
+  cta: "Review LocalServices AE's privacy practices and data protection standards.",
+  canonical: "https://localservices.ae/privacy",
+});
 
 const SECTIONS = [
   {
