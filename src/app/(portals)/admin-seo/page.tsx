@@ -32,6 +32,7 @@ interface Service {
   h1_override?: string;
   image_alt_text?: string;
   llms_txt_content?: string;
+  seo_keywords?: string[];
 }
 
 interface PaginatedData {
