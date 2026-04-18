@@ -2,6 +2,7 @@ import SiteNav from "@/components/layout/SiteNav";
 import SiteFooter from "@/components/layout/SiteFooter";
 import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
 import StickyMobileBar from "@/components/ui/StickyMobileBar";
+import UrgencyBar from "@/components/ui/UrgencyBar";
 
 export default function MarketingLayout({
   children,
@@ -10,6 +11,8 @@ export default function MarketingLayout({
 }) {
   return (
     <>
+      {/* Urgency bar — pinned above everything including the nav */}
+      <UrgencyBar />
       <SiteNav />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">{children}</main>

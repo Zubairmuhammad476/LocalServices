@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import TestimonialCarousel from "@/components/ui/TestimonialCarousel";
-import SearchBar from "@/components/ui/SearchBar";
 import ServicePowerGrid from "@/components/ui/ServicePowerGrid";
 import TrustRibbon from "@/components/ui/TrustRibbon";
 import HowItWorksSteps from "@/components/ui/HowItWorksSteps";
+import WhatsAppLeadForm from "@/components/ui/WhatsAppLeadForm";
 import { getServices } from "@/lib/api";
 import type { Service } from "@/types/service";
 
 /* ─── SEO Metadata ──────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "LocalServices AE | UAE's #1 Home Services — Arriving in 60 Minutes",
+  title: "UAE Professional Service Marketplace: Verified Maintenance and Technical Solutions | LocalServices AE",
   description:
-    "Book verified home services across Dubai, Abu Dhabi & all UAE Emirates. AC repair, cleaning, plumbing — 3,619+ certified pros, instant booking in AED. DED licensed.",
+    "The UAE Service Portal connects 8,500+ users with DED-licensed firms for 12 sectors like AC repair. Response time averages 20 minutes. Serving Dubai, Abu Dhabi & all 7 Emirates.",
   alternates: { canonical: "https://localservices.ae" },
   openGraph: {
-    title: "LocalServices AE | UAE's Most Reliable Home Services",
-    description: "3,619+ verified home services. Instant booking. All 7 UAE Emirates. DED Licensed professionals.",
+    title: "UAE Professional Service Marketplace: Verified Maintenance and Technical Solutions",
+    description: "8,500+ users connected with DED-licensed firms. 12 sectors. 20-minute average response. Instant WhatsApp quotes.",
     url: "https://localservices.ae",
     siteName: "LocalServices AE",
     type: "website",
+    images: [{ url: "/assets/images/homepage/hero.webp", width: 1200, height: 675, alt: "Verified technical maintenance services in Dubai and Abu Dhabi" }],
   },
 };
 
@@ -128,56 +129,66 @@ export default async function HomePage() {
 
       {/* ══ S1: ACTION HERO ════════════════════════════════════════════ */}
       <section
-        className="hero-section"
-        aria-label="Book UAE's most reliable home services, arriving in 60 minutes"
+        className="hero-v2-section"
+        aria-labelledby="hero-h1"
       >
-        {/* Background — Dubai villa / Abu Dhabi apartment feel */}
+        {/* Optimised WebP hero background — /public/assets/images/homepage/hero.webp */}
         <div className="hero-bg" aria-hidden="true">
           <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80"
-            alt="Luxury villa interior in Dubai UAE"
+            src="/assets/images/homepage/hero.webp"
+            alt="Verified technical maintenance services in Dubai and Abu Dhabi"
             className="hero-bg-img"
+            width={1200}
+            height={675}
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="hero-bg-overlay" />
         </div>
 
-        <div className="hero-content">
-          {/* Live status pill */}
-          <div className="animate-fade-in hero-status-pill">
-            <span className="hero-status-dot" />
-            <strong>LocalServices UAE</strong>&nbsp;is currently active
+        {/* Two-column layout: copy + form */}
+        <div className="hero-v2-inner">
+
+          {/* LEFT COLUMN — H1, description, stats */}
+          <div className="hero-v2-copy">
+            {/* Live status pill */}
+            <div className="animate-fade-in hero-status-pill">
+              <span className="hero-status-dot" />
+              <strong>LocalServices UAE</strong>&nbsp;is currently active
+            </div>
+
+            {/* H1 — SEO optimised, renders first in DOM */}
+            <h1 id="hero-h1" className="animate-fade-up anim-delay-1 hero-v2-h1">
+              UAE Professional Service Marketplace: Verified Maintenance and Technical Solutions
+            </h1>
+
+            {/* Description — immediately after H1 in DOM */}
+            <p className="animate-fade-up anim-delay-2 hero-v2-desc">
+              The UAE Service Portal connects 8,500+ users with DED-licensed firms for 12 sectors like AC repair. Response time averages 20 minutes, if quotes are requested.
+            </p>
+
+            {/* Social proof micro-stats */}
+            <div className="animate-fade-up anim-delay-3 hero-v2-stats">
+              {[
+                { value: "8,500+", label: "Verified Users", icon: "👥" },
+                { value: "12", label: "Service Sectors", icon: "🏗️" },
+                { value: "20 min", label: "Avg. Response", icon: "⚡" },
+              ].map((s) => (
+                <div key={s.label} className="hero-v2-stat">
+                  <span className="hero-v2-stat-icon">{s.icon}</span>
+                  <p className="hero-stat-value">{s.value}</p>
+                  <p className="hero-stat-label">{s.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* H1 — conversion-focused */}
-          <h1 className="animate-fade-up anim-delay-1 hero-h1">
-            UAE's Most Reliable<br className="hidden sm:block" />
-            Home Services—<span className="hero-h1-highlight">Arriving in 60 Minutes.</span>
-          </h1>
-
-          <p className="animate-fade-up anim-delay-2 hero-subtext">
-            Book verified professionals for cleaning, maintenance, and repairs<br className="hidden sm:block" />
-            across all 7 Emirates. DED Licensed. Background Checked. Insured.
-          </p>
-
-          {/* Floating search bar */}
-          <div className="animate-fade-up anim-delay-3 hero-search-wrap">
-            <SearchBar />
+          {/* RIGHT COLUMN — WhatsApp lead form */}
+          <div className="hero-v2-form-col">
+            <WhatsAppLeadForm />
           </div>
 
-          {/* Social proof micro-stats */}
-          <div className="animate-fade-up anim-delay-4 hero-stats">
-            {[
-              { value: "3,619+", label: "Verified Services" },
-              { value: "50,000+", label: "Happy Customers" },
-              { value: "4.9/5", label: "Google Rating" },
-            ].map((s) => (
-              <div key={s.label} className="hero-stat">
-                <p className="hero-stat-value">{s.value}</p>
-                <p className="hero-stat-label">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        </div>{/* /hero-v2-inner */}
       </section>
 
       {/* ══ S2: IMMEDIATE TRUST RIBBON ═══════════════════════════════ */}
