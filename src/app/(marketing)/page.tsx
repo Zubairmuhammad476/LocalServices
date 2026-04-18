@@ -127,7 +127,7 @@ export default async function HomePage() {
   return (
     <div className="overflow-x-hidden">
 
-      {/* ══ S1: ACTION HERO ════════════════════════════════════════════ */}
+      {/* -- S1: ACTION HERO -------------------------------------------- */}
       <section
         className="hero-v2-section"
         aria-labelledby="hero-h1"
@@ -191,10 +191,10 @@ export default async function HomePage() {
         </div>{/* /hero-v2-inner */}
       </section>
 
-      {/* ══ S2: IMMEDIATE TRUST RIBBON ═══════════════════════════════ */}
+      {/* -- S2: IMMEDIATE TRUST RIBBON --------------------------------- */}
       <TrustRibbon />
 
-      {/* ══ S3: SERVICE POWER GRID ════════════════════════════════════ */}
+      {/* -- S3: SERVICE POWER GRID ------------------------------------ */}
       <section
         className="power-grid-section"
         aria-label="Popular home services available across UAE"
@@ -217,10 +217,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S4: HOW IT WORKS ══════════════════════════════════════════ */}
+      {/* -- S4: HOW IT WORKS ------------------------------------------ */}
       <HowItWorksSteps />
 
-      {/* ══ S5: WHY UAE HOMEOWNERS TRUST US ══════════════════════════ */}
+      {/* -- S5: WHY UAE HOMEOWNERS TRUST US -------------------------- */}
       <section
         className="why-trust-section"
         aria-label="Why UAE homeowners trust LocalServices AE"
@@ -291,7 +291,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S6: LIVE IMPACT COUNTER ═══════════════════════════════════ */}
+      {/* -- S6: LIVE IMPACT COUNTER ----------------------------------- */}
       <section className="stats-section" aria-label="LocalServices AE platform statistics">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <p className="section-label">Live Impact</p>
@@ -318,7 +318,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S7: TESTIMONIALS ══════════════════════════════════════════ */}
+      {/* -- S7: TESTIMONIALS ------------------------------------------ */}
       <section className="testimonials-section" aria-label="Customer testimonials for LocalServices AE">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -332,7 +332,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S8: FAQ OBJECTION KILLER ══════════════════════════════════ */}
+      {/* -- S8: FAQ OBJECTION KILLER ---------------------------------- */}
       <section
         className="faq-section"
         aria-label="Frequently asked questions about LocalServices AE"
@@ -385,7 +385,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S9: FINAL HOOK CTA ════════════════════════════════════════ */}
+      {/* -- S9: FINAL HOOK CTA ---------------------------------------- */}
       <section
         className="final-cta-section"
         aria-label="Book your home service today"
@@ -424,7 +424,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ S10: SEO FOOTER LINK MATRIX ══════════════════════════════ */}
+      {/* -- S10: SEO FOOTER LINK MATRIX ------------------------------- */}
       <section
         className="seo-matrix-section"
         aria-label="Browse services by location across UAE"
