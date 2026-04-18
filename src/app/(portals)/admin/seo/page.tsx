@@ -7,6 +7,8 @@ import apiClient from "@/lib/api";
 import { toast } from "sonner";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import PowerEditorSlideover from "@/components/admin/PowerEditorSlideover";
+import PageContentEditor from "@/components/admin/editors/PageContentEditor";
+import type { ContentState } from "@/types/content";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -141,6 +143,7 @@ export default function AdminSeoDashboard() {
   const [filterEmirate, setFilterEmirate] = useState("");
   const [editService, setEditService] = useState<Service | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [serviceEditTab, setServiceEditTab] = useState<'meta' | 'content'>('meta');
 
   // Power Module State
   const [powerEditorSlug, setPowerEditorSlug] = useState<string | null>(null);
@@ -152,6 +155,8 @@ export default function AdminSeoDashboard() {
   // Sitemap state
   const [sitemapInfo, setSitemapInfo] = useState<SitemapInfo | null>(null);
   const [sitemapLoading, setSitemapLoading] = useState(false);
+  const [manualSitemapXml, setManualSitemapXml] = useState("");
+  const [manualSaving, setManualSaving] = useState(false);
 
   // Robots state
   const [robotsContent, setRobotsContent] = useState("");
@@ -318,6 +323,24 @@ export default function AdminSeoDashboard() {
     }
   }, []);
 
+  const saveManualSitemap = async () => {
+    if (!manualSitemapXml) {
+       toast.error("Please paste the XML content first.");
+       return;
+    }
+    setManualSaving(true);
+    try {
+      await apiClient.post("/admin/sitemap/manual", { xml_content: manualSitemapXml });
+      toast.success("Manual sitemap.xml permanently saved.");
+      setManualSitemapXml("");
+      void fetchSitemapInfo();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || "Failed to inject manual sitemap.");
+    } finally {
+      setManualSaving(false);
+    }
+  };
+
   const fetchRedirects = useCallback(async () => {
     try {
       const res = await apiClient.get<{ data: RedirectEntry[] }>("/admin/redirects");
@@ -359,6 +382,20 @@ export default function AdminSeoDashboard() {
       toast.error("Failed to update service");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const [savingContent, setSavingContent] = useState(false);
+  const handleSaveContent = async (content: ContentState) => {
+    if (!editService) return;
+    setSavingContent(true);
+    try {
+      await apiClient.post(`/admin/services/${editService.id}/content`, content);
+      toast.success("Page Content successfully updated.");
+    } catch {
+      toast.error("Failed to update page content.");
+    } finally {
+      setSavingContent(false);
     }
   };
 
@@ -446,7 +483,7 @@ export default function AdminSeoDashboard() {
   };
 
   if (isLoading) return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0a0f1e]">
+    <div className="flex min-h-screen items-center justify-center bg-transparent">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
     </div>
   );
@@ -454,79 +491,73 @@ export default function AdminSeoDashboard() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#080d1a] text-white">
-      {/* Top nav */}
-      <header className="border-b border-blue-500/10 bg-[#0a0f1e]/90 backdrop-blur-xl sticky top-0 z-40">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-4">
-            <div
-              className="flex h-9 w-9 items-center justify-center rounded-xl shadow-lg"
-              style={{ background: "linear-gradient(135deg, #0062FF, #22d3ee)", boxShadow: "0 4px 16px rgba(0,98,255,0.35)" }}
+    <div className="flex h-full min-h-screen" style={{ background: 'var(--portal-bg, #F8FAFC)' }}>
+
+      {/* ── SEO Sub-navigation Sidebar ─────────────────── */}
+      <aside style={{
+        width: '200px',
+        flexShrink: 0,
+        background: 'var(--portal-surface, #fff)',
+        borderRight: '1px solid var(--portal-border, #E2E8F0)',
+        minHeight: 'calc(100vh - 64px)',
+        padding: '1.25rem 0.75rem',
+        position: 'sticky',
+        top: '64px',
+        height: 'calc(100vh - 64px)',
+        overflowY: 'auto',
+      }}>
+        <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-text-light, #94A3B8)', padding: '0.5rem 0.75rem 0.25rem' }}>SEO Tools</p>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+          {[
+            { id: "services" as NavPanel, label: "Services", icon: "📋" },
+            { id: "sitemap" as NavPanel, label: "Sitemap", icon: "🗺️" },
+            { id: "robots" as NavPanel, label: "Robots.txt", icon: "🤖" },
+            { id: "redirects" as NavPanel, label: "301 Redirects", icon: "🔀" },
+            { id: "llms" as NavPanel, label: "llms.txt", icon: "🤖" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              id={`nav-${item.id}`}
+              onClick={() => setActivePanel(item.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                padding: '0.5rem 0.75rem', borderRadius: '0.5rem',
+                border: 'none', textAlign: 'left', cursor: 'pointer', width: '100%',
+                fontSize: '0.8125rem', fontWeight: activePanel === item.id ? 600 : 500,
+                background: activePanel === item.id ? 'rgba(37,99,235,0.08)' : 'transparent',
+                color: activePanel === item.id ? '#2563EB' : '#64748B',
+                boxShadow: activePanel === item.id ? 'inset 3px 0 0 #2563EB' : 'none',
+                transition: 'all 0.15s ease',
+              }}
             >
-              <span className="text-sm font-black text-white">LA</span>
+              <span>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Quick Stats */}
+        <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(37,99,235,0.06)', borderRadius: '0.5rem', border: '1px solid rgba(37,99,235,0.12)' }}>
+          <p style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#2563EB', marginBottom: '0.5rem' }}>Quick Stats</p>
+          <div style={{ fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#64748B' }}>Total</span>
+              <span style={{ fontWeight: 600, color: '#1E293B' }}>{totalServices.toLocaleString()}</span>
             </div>
-            <div>
-              <p className="text-xs text-slate-500">Admin Dashboard</p>
-              <h1 className="text-sm font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>SEO Control Center</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#64748B' }}>Optimized</span>
+              <span style={{ fontWeight: 600, color: '#16A34A' }}>{optimizedCount}</span>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-slate-400 sm:block">
-              {user?.name} · {user?.email}
-            </span>
-            <span className="badge-blue text-xs">admin</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#64748B' }}>Active</span>
+              <span style={{ fontWeight: 600, color: '#2563EB' }}>{activeCount}</span>
+            </div>
           </div>
         </div>
-      </header>
-
-      <div className="mx-auto flex max-w-[1600px]">
-        {/* Left Sidebar */}
-        <aside className="w-56 shrink-0 border-r border-blue-500/10 bg-[#0a0f1e]/60 min-h-[calc(100vh-65px)] p-4 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Navigation</p>
-          <nav className="space-y-1">
-            {[
-              { id: "services" as NavPanel, label: "Services", icon: "📋", desc: "SEO editor" },
-              { id: "sitemap" as NavPanel, label: "Sitemap", icon: "🗺️", desc: "XML sitemap" },
-              { id: "robots" as NavPanel, label: "Robots.txt", icon: "🤖", desc: "Crawler rules" },
-              { id: "redirects" as NavPanel, label: "301 Redirects", icon: "🔀", desc: "URL redirects" },
-              { id: "llms" as NavPanel, label: "llms.txt", icon: "🤖", desc: "AI discovery" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                id={`nav-${item.id}`}
-                onClick={() => setActivePanel(item.id)}
-                className={`dash-nav-item w-full text-left ${activePanel === item.id ? "active" : ""}`}
-              >
-                <span className="text-base">{item.icon}</span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{item.label}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{item.desc}</p>
-                </div>
-              </button>
-            ))}
-          </nav>
-
-          <div className="mt-6 rounded-xl border border-blue-500/20 bg-blue-500/5 p-3">
-            <p className="text-xs font-semibold text-blue-300">Quick Stats</p>
-            <div className="mt-2 space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Total</span>
-                <span className="font-medium text-white">{totalServices.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Optimized</span>
-                <span className="font-medium text-green-400">{optimizedCount}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Active</span>
-                <span className="font-medium text-cyan-400">{activeCount}</span>
-              </div>
-            </div>
-          </div>
-        </aside>
+      </aside>
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 p-6">
+        <main style={{ flex: 1, minWidth: 0, padding: '1.5rem', color: 'var(--portal-text, #1E293B)', background: 'var(--portal-bg, #F8FAFC)', overflowY: 'auto' }}>
 
           {/* ── SERVICES PANEL ── */}
           {activePanel === "services" && (
@@ -539,11 +570,11 @@ export default function AdminSeoDashboard() {
                   { label: "Active Services", value: activeCount.toLocaleString(), icon: "🟢", color: "from-cyan-600/20 to-cyan-900/10", border: "border-cyan-500/20" },
                   { label: "Page", value: `${currentPage} / ${totalPages}`, icon: "📖", color: "from-purple-600/20 to-purple-900/10", border: "border-purple-500/20" },
                 ].map((stat) => (
-                  <div key={stat.label} className={`stat-card bg-gradient-to-br ${stat.color} border ${stat.border}`}>
+                  <div key={stat.label} className="portal-stat">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs text-slate-400">{stat.label}</p>
-                        <p className="mt-1 text-3xl font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>{stat.value}</p>
+                        <p className="text-xs text-[var(--portal-text-muted)]">{stat.label}</p>
+                        <p className="mt-1 text-3xl font-bold text-[var(--portal-text)]" style={{ fontFamily: "var(--font-display)" }}>{stat.value}</p>
                       </div>
                       <span className="text-2xl">{stat.icon}</span>
                     </div>
@@ -552,19 +583,18 @@ export default function AdminSeoDashboard() {
               </div>
 
               {/* ── Auto-Optimization Control Panel ── */}
-              <div className="glass-card mb-6 overflow-hidden relative border-blue-500/20">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-[#0a1532]" />
-                <div className="relative p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="portal-card mb-6 overflow-hidden relative">
+                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg ${optStatus === 'running' ? 'bg-gradient-to-tr from-cyan-400 to-blue-500 animate-pulse' : 'bg-slate-800 border border-slate-700'}`}>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg ${optStatus === 'running' ? 'bg-[var(--portal-primary)] text-white animate-pulse' : 'bg-[var(--portal-border-sm)] text-[var(--portal-text-muted)]'}`}>
                       <span className="text-xl">{optStatus === 'running' ? '⚡' : '⏸️'}</span>
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white flex items-center gap-2" style={{ fontFamily: "var(--font-display)" }}>
+                      <h3 className="text-sm font-bold text-[var(--portal-text)] flex items-center gap-2" style={{ fontFamily: "var(--font-display)" }}>
                         AI Auto-Optimization Engine
                         {optStatus === 'running' && <span className="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping" />}
                       </h3>
-                      <p className="text-xs text-slate-400 mt-1 max-w-lg">
+                      <p className="text-xs text-[var(--portal-text-muted)] mt-1 max-w-lg">
                         Automatically processes unoptimized services in the background using Gemini. Queues batches of jobs while strictly adhering to rate limits (5 req/min).
                       </p>
                     </div>
@@ -581,12 +611,12 @@ export default function AdminSeoDashboard() {
                           {optLoading ? "Halting..." : "Stop Optimization"}
                         </button>
                         <div className="w-full relative mt-1">
-                          <div className="flex justify-between text-[10px] text-cyan-300 font-medium mb-1">
+                          <div className="flex justify-between text-[10px] text-[var(--portal-primary)] font-medium mb-1">
                             <span>Processing Batch</span>
                             <span>{Math.round(optPercentage)}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan-400 transition-all duration-500" style={{ width: `${optPercentage}%` }} />
+                          <div className="h-1.5 w-full bg-[var(--portal-border-sm)] rounded-full overflow-hidden">
+                            <div className="h-full bg-[var(--portal-primary)] transition-all duration-500" style={{ width: `${optPercentage}%` }} />
                           </div>
                         </div>
                       </>
@@ -599,7 +629,7 @@ export default function AdminSeoDashboard() {
                         >
                           {optLoading ? "Starting..." : "Start Auto-Optimization ▶"}
                         </button>
-                        <p className="text-[10px] text-slate-500 text-right">Idling. Awaiting admin permission.</p>
+                        <p className="text-[10px] text-[var(--portal-text-light)] text-right">Idling. Awaiting admin permission.</p>
                       </>
                     )}
                   </div>
@@ -610,40 +640,31 @@ export default function AdminSeoDashboard() {
               <div className="glass-card p-5 mb-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="relative flex-1 min-w-[200px]">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--portal-text-light)]">🔍</span>
                     <input
                       type="text"
                       value={search}
                       onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                       placeholder="Search services..."
-                      className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-9 pr-4 text-sm text-white placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] py-2.5 pl-9 pr-4 text-sm text-[var(--portal-text)] placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
 
                   <select
-                    value={filterLayout}
-                    onChange={(e) => { setFilterLayout(e.target.value); setCurrentPage(1); }}
-                    className="rounded-xl border border-white/10 bg-[#0d1530] px-3 py-2.5 text-sm text-white focus:border-blue-500/40 focus:outline-none"
-                  >
-                    <option value="">All Layouts</option>
-                    {LAYOUTS.map((l) => <option key={l} value={l}>{l}</option>)}
-                  </select>
-
-                  <select
                     value={filterEmirate}
                     onChange={(e) => { setFilterEmirate(e.target.value); setCurrentPage(1); }}
-                    className="rounded-xl border border-white/10 bg-[#0d1530] px-3 py-2.5 text-sm text-white focus:border-blue-500/40 focus:outline-none"
+                    className="rounded-xl border border-[var(--portal-border)] bg-transparent px-3 py-2.5 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none"
                   >
                     <option value="">All Emirates</option>
                     {EMIRATES.map((e) => <option key={e} value={e}>{e.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
                   </select>
 
-                  <div className="flex rounded-xl border border-white/10 bg-white/5 p-1">
+                  <div className="flex rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] p-1">
                     {(["all", "optimized", "pending"] as const).map((tab) => (
                       <button
                         key={tab}
                         onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all ${activeTab === tab ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"}`}
+                        className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all ${activeTab === tab ? "bg-blue-600 text-[var(--portal-text)]" : "text-[var(--portal-text-muted)] hover:text-[var(--portal-text)]"}`}
                       >
                         {tab}
                       </button>
@@ -668,35 +689,34 @@ export default function AdminSeoDashboard() {
               </div>
 
               {/* Table */}
-              <div className="overflow-hidden rounded-2xl border border-blue-500/10 bg-[#0d1530]">
+              <div className="overflow-hidden rounded-2xl border border-[var(--portal-border)] bg-transparent">
                 {loading ? (
                   <div className="flex items-center justify-center py-20">
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                    <span className="ml-3 text-sm text-slate-400">Loading services...</span>
+                    <span className="ml-3 text-sm text-[var(--portal-text-muted)]">Loading services...</span>
                   </div>
                 ) : services.length === 0 ? (
-                  <div className="py-20 text-center text-slate-400">
+                  <div className="py-20 text-center text-[var(--portal-text-muted)]">
                     <p className="text-4xl">📭</p>
                     <p className="mt-2 text-sm">No services found matching your filters.</p>
                   </div>
                 ) : (
                   <div 
                     ref={tableContainerRef} 
-                    className="overflow-auto border-t border-white/5" 
+                    className="overflow-auto border-t border-[var(--portal-border-sm)]" 
                     style={{ height: "600px", position: "relative" }}
                   >
                     <table className="w-full text-sm block">
-                      <thead className="block border-b border-white/5 bg-[#0d1530] sticky top-0 z-10 w-full backdrop-blur-md">
-                        <tr className="flex w-full">
-                          <th className="flex-[0.5] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">ID</th>
-                          <th className="flex-[1.5] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Service Name</th>
-                          <th className="flex-[0.8] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Layout</th>
-                          <th className="flex-[1.5] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">SEO Title</th>
-                          <th className="flex-[0.8] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Price (AED)</th>
-                          <th className="flex-[0.9] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">Alt Text</th>
-                          <th className="flex-[1.0] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">SEO</th>
-                          <th className="flex-[0.6] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">Status</th>
-                          <th className="flex-[1.6] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">Actions</th>
+                      <thead className="block border-b border-[var(--portal-border-sm)] bg-transparent sticky top-0 z-10 w-full backdrop-blur-md">
+                        <tr className="grid w-full items-center" style={{ gridTemplateColumns: '5fr 15fr 8fr 15fr 9fr 10fr 6fr 16fr' }}>
+                          <th className="px-4 py-3 text-left text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">ID</th>
+                          <th className="px-4 py-3 text-left text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">Service Name</th>
+                          <th className="px-4 py-3 text-left text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">Layout</th>
+                          <th className="px-4 py-3 text-left text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">SEO Title</th>
+                          <th className="px-4 py-3 text-center text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">Alt Text</th>
+                          <th className="px-4 py-3 text-center text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">SEO</th>
+                          <th className="px-4 py-3 text-center text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">Status</th>
+                          <th className="px-4 py-3 text-center text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">Actions</th>
                         </tr>
                       </thead>
                       <tbody 
@@ -708,27 +728,28 @@ export default function AdminSeoDashboard() {
                           return (
                           <tr 
                             key={service.id} 
-                            className="absolute top-0 left-0 w-full flex items-center data-table-row border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                            className="absolute top-0 left-0 w-full grid items-center data-table-row border-b border-[var(--portal-border-sm)] hover:bg-white/[0.02] transition-colors"
                             style={{
+                              gridTemplateColumns: '5fr 15fr 8fr 15fr 9fr 10fr 6fr 16fr',
                               height: `${virtualRow.size}px`,
                               transform: `translateY(${virtualRow.start}px)`,
                             }}
                           >
-                            <td className="flex-[0.5] px-4 py-2 text-xs text-slate-500">#{service.id}</td>
-                            <td className="flex-[1.5] px-4 py-2 overflow-hidden">
-                              <p className="font-medium text-white truncate">{service.name}</p>
-                              <p className="text-[10px] text-slate-500 truncate">/{service.slug}</p>
+                            <td className="px-4 py-2 text-xs text-[var(--portal-text-light)]">#{service.id}</td>
+                            <td className="px-4 py-2 overflow-hidden">
+                              <p className="font-medium text-[var(--portal-text)] truncate">{service.name}</p>
+                              <p className="text-[10px] text-[var(--portal-text-light)] truncate">/{service.slug}</p>
                               {service.no_index && <span className="text-[10px] text-red-400 font-medium">noindex</span>}
                             </td>
-                            <td className="flex-[0.8] px-4 py-2">
+                            <td className="px-4 py-2">
                               <span className={`${LAYOUT_COLORS[service.design_layout] ?? "badge-blue"} scale-90 origin-left inline-block`}>
                                 {service.design_layout}
                               </span>
                             </td>
-                            <td className="flex-[1.5] px-4 py-2 overflow-hidden">
-                              <p className="truncate text-[11px] text-slate-300">{service.seo_title || "—"}</p>
+                            <td className="px-4 py-2 overflow-hidden">
+                              <p className="truncate text-[11px] text-slate-400">{service.seo_title || "—"}</p>
                               {service.seo_title && (
-                                <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-white/10">
+                                <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                                   <div
                                     className={`h-1 rounded-full ${service.seo_title.length > 70 ? "bg-red-400" : service.seo_title.length > 60 ? "bg-amber-400" : "bg-green-400"}`}
                                     style={{ width: `${Math.min((service.seo_title.length / 70) * 100, 100)}%` }}
@@ -736,37 +757,30 @@ export default function AdminSeoDashboard() {
                                 </div>
                               )}
                             </td>
-                            <td className="flex-[0.8] px-4 py-2 text-xs text-cyan-300">
-                              {service.base_price ? `AED ${service.base_price}` : "—"}
-                            </td>
-                            <td className="flex-[0.9] px-4 py-2 text-center">
+                            <td className="px-4 py-2 text-center text-sm">
                               {service.image_alt_text ? (
-                                <span className="badge-green text-[9px] px-2 py-1">✓ Set</span>
+                                <span className="text-green-500 font-bold" title="Set">✓</span>
                               ) : (
-                                <span className="badge-amber text-[9px] px-2 py-1">⚠ Missing</span>
+                                <span className="text-amber-500 font-bold" title="Missing">❌</span>
                               )}
                             </td>
-                            <td className="flex-[1.0] px-4 py-2 text-center">
-                              <span className={`${service.is_seo_optimized ? "text-green-400" : "text-amber-400"} text-[10px] font-medium`}>
+                            <td className="px-4 py-2 text-center">
+                              <span className={`${service.is_seo_optimized ? "text-green-500 font-semibold" : "text-amber-500 font-medium"} text-[10px]`}>
                                 {service.is_seo_optimized ? "✓ Optimized" : "⚠ Pending"}
                               </span>
                             </td>
-                            <td className="flex-[0.6] px-4 py-2 flex justify-center">
+                            <td className="px-4 py-2 flex justify-center">
                               <div className={`h-2.5 w-2.5 rounded-full ${service.is_active ? "bg-green-500" : "bg-red-500"}`} title={service.is_active ? "Active" : "Inactive"} />
                             </td>
-                            <td className="flex-[1.6] px-2 py-2">
-                              <div className="flex items-center justify-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => setPowerEditorSlug(service.slug)}
-                                  className="rounded bg-purple-500/10 p-1.5 text-purple-400 hover:bg-purple-500/20 text-xs" title="SEO Power Tools"
-                                >⚡ Power</button>
+                            <td className="px-4 py-2">
+                              <div className="flex items-center justify-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
                                 <button
                                   onClick={() => { setEditService({ ...service }); setEditOpen(true); }}
-                                  className="rounded bg-blue-500/10 p-1.5 text-blue-400 hover:bg-blue-500/20 text-xs" title="Edit"
+                                  className="rounded border border-blue-200 shadow-sm bg-blue-50 px-3 py-1.5 text-blue-700 hover:bg-blue-100 text-xs font-semibold" title="Edit"
                                 >✏️ Edit</button>
                                 <button
                                   onClick={() => setDeleteConfirm(service.id)}
-                                  className="rounded bg-red-500/10 p-1.5 text-red-400 hover:bg-red-500/20 text-xs" title="Deactivate"
+                                  className="rounded border border-red-200 shadow-sm bg-red-50 px-3 py-1.5 text-red-700 hover:bg-red-100 text-xs font-semibold" title="Deactivate"
                                 >🗑️</button>
                               </div>
                             </td>
@@ -780,15 +794,15 @@ export default function AdminSeoDashboard() {
 
                 {/* Pagination */}
                 {!loading && totalPages > 1 && (
-                  <div className="flex items-center justify-between border-t border-white/5 px-6 py-4">
-                    <p className="text-xs text-slate-400">
+                  <div className="flex items-center justify-between border-t border-[var(--portal-border-sm)] px-6 py-4">
+                    <p className="text-xs text-[var(--portal-text-muted)]">
                       Showing {(currentPage - 1) * 20 + 1}–{Math.min(currentPage * 20, totalServices)} of {totalServices} services
                     </p>
                     <div className="flex gap-1">
                       <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="rounded-xl border border-white/10 px-3 py-1.5 text-xs disabled:opacity-40 hover:bg-white/5"
+                        className="rounded-xl border border-[var(--portal-border)] px-3 py-1.5 text-xs disabled:opacity-40 hover:bg-[var(--portal-surface)]"
                       >← Prev</button>
                       {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                         const page = Math.max(1, Math.min(currentPage - 2, totalPages - 4)) + i;
@@ -796,7 +810,7 @@ export default function AdminSeoDashboard() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`rounded-xl px-3 py-1.5 text-xs ${page === currentPage ? "bg-blue-600 text-white" : "border border-white/10 text-slate-400 hover:bg-white/5"}`}
+                            className={`rounded-xl px-3 py-1.5 text-xs ${page === currentPage ? "bg-blue-600 text-[var(--portal-text)]" : "border border-[var(--portal-border)] text-[var(--portal-text-muted)] hover:bg-[var(--portal-surface)]"}`}
                           >
                             {page}
                           </button>
@@ -805,7 +819,7 @@ export default function AdminSeoDashboard() {
                       <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="rounded-xl border border-white/10 px-3 py-1.5 text-xs disabled:opacity-40 hover:bg-white/5"
+                        className="rounded-xl border border-[var(--portal-border)] px-3 py-1.5 text-xs disabled:opacity-40 hover:bg-[var(--portal-surface)]"
                       >Next →</button>
                     </div>
                   </div>
@@ -818,8 +832,8 @@ export default function AdminSeoDashboard() {
           {activePanel === "sitemap" && (
             <div>
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">🗺️ XML Sitemap Manager</h2>
-                <p className="mt-1 text-sm text-slate-400">Dynamically generated from all active services in the database.</p>
+                <h2 className="text-xl font-bold text-[var(--portal-text)]">🗺️ XML Sitemap Manager</h2>
+                <p className="mt-1 text-sm text-[var(--portal-text-muted)]">Dynamically generated from all active services in the database.</p>
               </div>
 
               {sitemapLoading ? (
@@ -827,25 +841,25 @@ export default function AdminSeoDashboard() {
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="glass-card p-6 col-span-full sm:col-span-1">
-                    <p className="text-xs text-slate-400 mb-1">Total URLs</p>
-                    <p className="text-4xl font-bold text-white">{sitemapInfo?.total_urls ?? "—"}</p>
-                    <p className="mt-1 text-xs text-slate-500">{sitemapInfo?.total_services ?? 0} services + homepage</p>
+                    <p className="text-xs text-[var(--portal-text-muted)] mb-1">Total URLs</p>
+                    <p className="text-4xl font-bold text-[var(--portal-text)]">{sitemapInfo?.total_urls ?? "—"}</p>
+                    <p className="mt-1 text-xs text-[var(--portal-text-light)]">{sitemapInfo?.total_services ?? 0} services + homepage</p>
                   </div>
                   <div className="glass-card p-6">
-                    <p className="text-xs text-slate-400 mb-1">SEO Optimized</p>
+                    <p className="text-xs text-[var(--portal-text-muted)] mb-1">SEO Optimized</p>
                     <p className="text-4xl font-bold text-green-400">{sitemapInfo?.optimized ?? "—"}</p>
-                    <p className="mt-1 text-xs text-slate-500">Higher priority in sitemap</p>
+                    <p className="mt-1 text-xs text-[var(--portal-text-light)]">Higher priority in sitemap</p>
                   </div>
                   <div className="glass-card p-6">
-                    <p className="text-xs text-slate-400 mb-1">Last Generated</p>
-                    <p className="text-sm font-semibold text-white">{sitemapInfo?.last_generated ? new Date(sitemapInfo.last_generated).toLocaleString() : "—"}</p>
-                    <p className="mt-1 text-xs text-slate-500">Generated dynamically on request</p>
+                    <p className="text-xs text-[var(--portal-text-muted)] mb-1">Last Generated</p>
+                    <p className="text-sm font-semibold text-[var(--portal-text)]">{sitemapInfo?.last_generated ? new Date(sitemapInfo.last_generated).toLocaleString() : "—"}</p>
+                    <p className="mt-1 text-xs text-[var(--portal-text-light)]">Generated dynamically on request</p>
                   </div>
                 </div>
               )}
 
               <div className="mt-6 glass-card p-6">
-                <h3 className="text-sm font-semibold text-white mb-4">Actions</h3>
+                <h3 className="text-sm font-semibold text-[var(--portal-text)] mb-4">Actions</h3>
                 <div className="flex flex-wrap gap-3">
                   <a
                     href="http://localhost:8000/api/admin/sitemap.xml"
@@ -860,7 +874,7 @@ export default function AdminSeoDashboard() {
                       void fetchSitemapInfo();
                       toast.success("Sitemap data refreshed!");
                     }}
-                    className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all shadow-lg shadow-blue-500/25"
+                    className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-[var(--portal-text)] hover:opacity-90 transition-all shadow-lg shadow-blue-500/25"
                   >
                     ↻ Refresh Stats
                   </button>
@@ -869,16 +883,37 @@ export default function AdminSeoDashboard() {
                       void navigator.clipboard.writeText("http://localhost:8000/api/admin/sitemap.xml");
                       toast.success("Sitemap URL copied!");
                     }}
-                    className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 transition-all"
+                    className="rounded-xl border border-[var(--portal-border)] px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-[var(--portal-surface)] transition-all"
                   >
                     📋 Copy URL
                   </button>
                 </div>
 
-                <div className="mt-4 rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                  <p className="text-xs text-slate-400 mb-2">Sitemap Endpoint</p>
+                <div className="mt-4 rounded-xl border border-[var(--portal-border-sm)] bg-white/[0.02] p-4">
+                  <p className="text-xs text-[var(--portal-text-muted)] mb-2">Sitemap Endpoint</p>
                   <code className="text-xs text-green-400 font-mono">http://localhost:8000/api/admin/sitemap.xml</code>
-                  <p className="mt-2 text-xs text-slate-500">For production, configure this to point to your domain. Submit to Google Search Console and Bing Webmaster tools.</p>
+                  <p className="mt-2 text-xs text-[var(--portal-text-light)]">For production, configure this to point to your domain. Submit to Google Search Console and Bing Webmaster tools.</p>
+                </div>
+
+                <div className="mt-8 border-t border-[var(--portal-border-sm)] pt-6">
+                  <h3 className="text-sm font-semibold text-[var(--portal-text)] mb-2">Manual Sitemap Override</h3>
+                  <p className="text-xs text-[var(--portal-text-muted)] mb-4">Paste your raw XML below to securely overwrite the generated `public/sitemap.xml` file. Required format must begin with `&lt;?xml`.</p>
+                  <textarea
+                    value={manualSitemapXml}
+                    onChange={(e) => setManualSitemapXml(e.target.value)}
+                    placeholder={'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n...</urlset>'}
+                    rows={8}
+                    className="w-full rounded-xl border border-red-500/20 bg-black/40 px-4 py-3 font-mono text-xs text-slate-300 resize-none focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                  />
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={saveManualSitemap}
+                      disabled={manualSaving || !manualSitemapXml}
+                      className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-2.5 text-sm font-bold text-red-500 hover:bg-red-500/20 transition-all disabled:opacity-50"
+                    >
+                      {manualSaving ? "Injecting XML..." : "⚠️ Inject Manual XML"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -888,17 +923,17 @@ export default function AdminSeoDashboard() {
           {activePanel === "robots" && (
             <div>
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">🤖 Robots.txt Editor</h2>
-                <p className="mt-1 text-sm text-slate-400">Control which bots can crawl your site and which URLs to block.</p>
+                <h2 className="text-xl font-bold text-[var(--portal-text)]">🤖 Robots.txt Editor</h2>
+                <p className="mt-1 text-sm text-[var(--portal-text-muted)]">Control which bots can crawl your site and which URLs to block.</p>
               </div>
 
               <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm font-medium text-white">robots.txt content</p>
+                  <p className="text-sm font-medium text-[var(--portal-text)]">robots.txt content</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setRobotsContent("User-agent: *\nAllow: /\n\nSitemap: http://localhost:3000/sitemap.xml\n")}
-                      className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-slate-400 hover:bg-white/5 transition-all"
+                      className="rounded-lg border border-[var(--portal-border)] px-3 py-1.5 text-xs text-[var(--portal-text-muted)] hover:bg-[var(--portal-surface)] transition-all"
                     >
                       Reset to Default
                     </button>
@@ -909,7 +944,7 @@ export default function AdminSeoDashboard() {
                   value={robotsContent}
                   onChange={(e) => setRobotsContent(e.target.value)}
                   rows={16}
-                  className="w-full rounded-xl border border-white/10 bg-[#080d1a] px-4 py-3 font-mono text-xs text-green-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-transparent px-4 py-3 font-mono text-xs text-green-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   placeholder={"User-agent: *\nAllow: /\n\nSitemap: https://yourdomain.com/sitemap.xml"}
                 />
                 <div className="mt-4 flex gap-3">
@@ -925,7 +960,7 @@ export default function AdminSeoDashboard() {
 
                 <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                   <p className="text-xs font-semibold text-amber-300">⚠️ Common Rules</p>
-                  <div className="mt-2 space-y-1 text-xs text-slate-400">
+                  <div className="mt-2 space-y-1 text-xs text-[var(--portal-text-muted)]">
                     <p><code className="text-amber-200">Disallow: /admin</code> — Block admin pages from bots</p>
                     <p><code className="text-amber-200">Disallow: /api/</code> — Block API endpoints</p>
                     <p><code className="text-amber-200">Allow: /</code> — Allow all public pages</p>
@@ -939,13 +974,13 @@ export default function AdminSeoDashboard() {
           {activePanel === "redirects" && (
             <div>
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">🔀 301 Redirect Manager</h2>
-                <p className="mt-1 text-sm text-slate-400">Manage permanent URL redirects to preserve SEO juice and avoid 404 errors.</p>
+                <h2 className="text-xl font-bold text-[var(--portal-text)]">🔀 301 Redirect Manager</h2>
+                <p className="mt-1 text-sm text-[var(--portal-text-muted)]">Manage permanent URL redirects to preserve SEO juice and avoid 404 errors.</p>
               </div>
 
               {/* Add form */}
               <div className="glass-card p-6 mb-6">
-                <h3 className="text-sm font-semibold text-white mb-4">Add New Redirect</h3>
+                <h3 className="text-sm font-semibold text-[var(--portal-text)] mb-4">Add New Redirect</h3>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-slate-300">From Path</label>
@@ -955,7 +990,7 @@ export default function AdminSeoDashboard() {
                       value={redirectForm.from_path}
                       onChange={(e) => setRedirectForm({ ...redirectForm, from_path: e.target.value })}
                       placeholder="/old-service-name"
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-2.5 text-sm text-[var(--portal-text)] placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div>
@@ -966,7 +1001,7 @@ export default function AdminSeoDashboard() {
                       value={redirectForm.to_path}
                       onChange={(e) => setRedirectForm({ ...redirectForm, to_path: e.target.value })}
                       placeholder="/new-service-name"
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-2.5 text-sm text-[var(--portal-text)] placeholder-slate-500 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div>
@@ -974,7 +1009,7 @@ export default function AdminSeoDashboard() {
                     <select
                       value={redirectForm.http_code}
                       onChange={(e) => setRedirectForm({ ...redirectForm, http_code: parseInt(e.target.value) })}
-                      className="w-full rounded-xl border border-white/10 bg-[#0d1530] px-4 py-2.5 text-sm text-white focus:border-blue-500/40 focus:outline-none"
+                      className="w-full rounded-xl border border-[var(--portal-border)] bg-transparent px-4 py-2.5 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none"
                     >
                       <option value={301}>301 — Permanent</option>
                       <option value={302}>302 — Temporary</option>
@@ -992,19 +1027,19 @@ export default function AdminSeoDashboard() {
               </div>
 
               {/* Redirects table */}
-              <div className="overflow-hidden rounded-2xl border border-blue-500/10 bg-[#0d1530]">
+              <div className="overflow-hidden rounded-2xl border border-[var(--portal-border)] bg-transparent">
                 {redirects.length === 0 ? (
                   <div className="py-16 text-center">
                     <p className="text-3xl">🔀</p>
-                    <p className="mt-2 text-sm text-slate-400">No redirects configured yet.</p>
+                    <p className="mt-2 text-sm text-[var(--portal-text-muted)]">No redirects configured yet.</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-white/5 bg-white/[0.02]">
+                        <tr className="border-b border-[var(--portal-border-sm)] bg-white/[0.02]">
                           {["From", "To", "Code", "Created", "Action"].map((h) => (
-                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{h}</th>
+                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--portal-text-muted)]">{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -1016,7 +1051,7 @@ export default function AdminSeoDashboard() {
                             <td className="px-4 py-3">
                               <span className={r.http_code === 301 ? "badge-green" : "badge-amber"}>{r.http_code}</span>
                             </td>
-                            <td className="px-4 py-3 text-xs text-slate-400">
+                            <td className="px-4 py-3 text-xs text-[var(--portal-text-muted)]">
                               {new Date(r.created_at).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3">
@@ -1041,13 +1076,13 @@ export default function AdminSeoDashboard() {
           {activePanel === "llms" && (
             <div>
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">🤖 llms.txt Generator</h2>
-                <p className="mt-1 text-sm text-slate-400">Manage your AI-discovery file that helps large language models understand your site.</p>
+                <h2 className="text-xl font-bold text-[var(--portal-text)]">🤖 llms.txt Generator</h2>
+                <p className="mt-1 text-sm text-[var(--portal-text-muted)]">Manage your AI-discovery file that helps large language models understand your site.</p>
               </div>
 
               <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm font-medium text-white">llms.txt content</p>
+                  <p className="text-sm font-medium text-[var(--portal-text)]">llms.txt content</p>
                   <a
                     href="https://llmstxt.org/"
                     target="_blank"
@@ -1062,7 +1097,7 @@ export default function AdminSeoDashboard() {
                   value={llmsContent}
                   onChange={(e) => setLlmsContent(e.target.value)}
                   rows={20}
-                  className="w-full rounded-xl border border-white/10 bg-[#080d1a] px-4 py-3 font-mono text-xs text-cyan-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-transparent px-4 py-3 font-mono text-xs text-cyan-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   placeholder={"# Site Name\n\n> Description for LLMs\n\nOptional links:"}
                 />
                 <div className="mt-4 flex gap-3">
@@ -1078,7 +1113,7 @@ export default function AdminSeoDashboard() {
 
                 <div className="mt-4 rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
                   <p className="text-xs font-semibold text-blue-300">📌 llms.txt Format</p>
-                  <div className="mt-2 text-xs text-slate-400 space-y-1">
+                  <div className="mt-2 text-xs text-[var(--portal-text-muted)] space-y-1">
                     <p><code className="text-cyan-300"># Site Name</code> — H1 with your site name</p>
                     <p><code className="text-cyan-300">&gt; Description</code> — Blockquote with key description</p>
                     <p><code className="text-cyan-300">## Section</code> — Sections for different topics</p>
@@ -1086,7 +1121,7 @@ export default function AdminSeoDashboard() {
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-500">
+                <div className="mt-3 rounded-xl border border-[var(--portal-border-sm)] bg-white/[0.02] p-4 text-xs text-[var(--portal-text-light)]">
                   Saved to storage and served at <code className="text-cyan-400">/llms.txt</code> via the Next.js public folder.
                 </div>
               </div>
@@ -1094,7 +1129,7 @@ export default function AdminSeoDashboard() {
           )}
 
         </main>
-      </div>
+
 
       {/* ── EDIT SERVICE MODAL ── */}
       {editOpen && editService && (
@@ -1102,35 +1137,52 @@ export default function AdminSeoDashboard() {
           <div className="glass-card w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white">Edit Service</h2>
-                <p className="text-xs text-slate-400">#{editService.id} · /{editService.slug}</p>
+                <h2 className="text-xl font-bold text-[var(--portal-text)]">Edit Service</h2>
+                <p className="text-xs text-[var(--portal-text-muted)]">#{editService.id} · /{editService.slug}</p>
               </div>
-              <button onClick={() => setEditOpen(false)} className="rounded-xl border border-white/10 p-2 text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setEditOpen(false)} className="rounded-xl border border-[var(--portal-border)] p-2 text-[var(--portal-text-muted)] hover:text-[var(--portal-text)]">✕</button>
             </div>
 
-            <div className="space-y-5">
-              {/* SEO Title */}
-              <div>
-                <label className="mb-1.5 flex justify-between text-xs font-medium text-slate-300">
-                  SEO Title <span className={editService.seo_title?.length > 70 ? "text-red-400" : "text-slate-500"}>{editService.seo_title?.length ?? 0}/70</span>
-                </label>
-                <input
-                  value={editService.seo_title ?? ""}
-                  onChange={(e) => setEditService({ ...editService, seo_title: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
+            <div className="flex items-center gap-1 border-b border-[var(--portal-border-sm)] pb-4 mb-6">
+              <button 
+                onClick={() => setServiceEditTab('meta')}
+                className={`px-4 py-2 text-sm font-semibold transition-all rounded-lg ${serviceEditTab === 'meta' ? 'bg-blue-600/10 text-blue-400 shadow-[inset_0_-2px_0_0_#3b82f6]' : 'text-[var(--portal-text-muted)] hover:text-[var(--portal-text)] hover:bg-[var(--portal-surface)]'}`}
+              >
+                SEO Metadata
+              </button>
+              <button 
+                onClick={() => setServiceEditTab('content')}
+                className={`px-4 py-2 text-sm font-semibold transition-all rounded-lg ${serviceEditTab === 'content' ? 'bg-blue-600/10 text-blue-400 shadow-[inset_0_-2px_0_0_#3b82f6]' : 'text-[var(--portal-text-muted)] hover:text-[var(--portal-text)] hover:bg-[var(--portal-surface)]'}`}
+              >
+                Page Content Engine
+              </button>
+            </div>
+
+            {serviceEditTab === 'meta' && (
+              <>
+                <div className="space-y-5">
+                  {/* SEO Title */}
+                  <div>
+                    <label className="mb-1.5 flex justify-between text-xs font-medium text-slate-300">
+                      SEO Title <span className={editService.seo_title?.length > 70 ? "text-red-400" : "text-[var(--portal-text-light)]"}>{editService.seo_title?.length ?? 0}/70</span>
+                    </label>
+                    <input
+                      value={editService.seo_title ?? ""}
+                      onChange={(e) => setEditService({ ...editService, seo_title: e.target.value })}
+                      className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
 
               {/* Meta Description */}
               <div>
                 <label className="mb-1.5 flex justify-between text-xs font-medium text-slate-300">
-                  Meta Description <span className={editService.seo_description?.length > 160 ? "text-red-400" : "text-slate-500"}>{editService.seo_description?.length ?? 0}/160</span>
+                  Meta Description <span className={editService.seo_description?.length > 160 ? "text-red-400" : "text-[var(--portal-text-light)]"}>{editService.seo_description?.length ?? 0}/160</span>
                 </label>
                 <textarea
                   value={editService.seo_description ?? ""}
                   onChange={(e) => setEditService({ ...editService, seo_description: e.target.value })}
                   rows={3}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -1142,7 +1194,7 @@ export default function AdminSeoDashboard() {
                     value={editService.h1_override ?? ""}
                     onChange={(e) => setEditService({ ...editService, h1_override: e.target.value })}
                     placeholder="Leave blank to use service name"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <div>
@@ -1154,7 +1206,7 @@ export default function AdminSeoDashboard() {
                     value={editService.image_alt_text ?? ""}
                     onChange={(e) => setEditService({ ...editService, image_alt_text: e.target.value })}
                     placeholder="Describe the service image for SEO..."
-                    className={`w-full rounded-xl border px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${!editService.image_alt_text ? "border-amber-500/40 bg-amber-500/5" : "border-white/10 bg-white/5"}`}
+                    className={`w-full rounded-xl border px-4 py-3 text-sm text-[var(--portal-text)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${!editService.image_alt_text ? "border-amber-500/40 bg-amber-500/5" : "border-[var(--portal-border)] bg-[var(--portal-surface)]"}`}
                   />
                 </div>
               </div>
@@ -1172,7 +1224,7 @@ export default function AdminSeoDashboard() {
                     setEditService({ ...editService, seo_keywords: keywordsArray });
                   }}
                   placeholder="e.g. electrician dubai, 24/7 repair, emergency electrical"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -1183,7 +1235,7 @@ export default function AdminSeoDashboard() {
                   <input
                     value={editService.slug ?? ""}
                     onChange={(e) => setEditService({ ...editService, slug: e.target.value })}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-cyan-300 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 font-mono text-sm text-cyan-300 focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <div>
@@ -1193,7 +1245,7 @@ export default function AdminSeoDashboard() {
                     value={editService.canonical_url ?? ""}
                     onChange={(e) => setEditService({ ...editService, canonical_url: e.target.value })}
                     placeholder="https://... (blank = self)"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
@@ -1206,7 +1258,7 @@ export default function AdminSeoDashboard() {
                   value={editService.redirect_to ?? ""}
                   onChange={(e) => setEditService({ ...editService, redirect_to: e.target.value })}
                   placeholder="/new-slug or https://... (leave blank for no redirect)"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -1217,7 +1269,7 @@ export default function AdminSeoDashboard() {
                   <select
                     value={editService.design_layout}
                     onChange={(e) => setEditService({ ...editService, design_layout: e.target.value })}
-                    className="w-full rounded-xl border border-white/10 bg-[#0d1530] px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none"
+                    className="w-full rounded-xl border border-[var(--portal-border)] bg-transparent px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none"
                   >
                     {LAYOUTS.map((l) => <option key={l} value={l}>{l}</option>)}
                   </select>
@@ -1228,7 +1280,7 @@ export default function AdminSeoDashboard() {
                     type="number"
                     value={editService.base_price ?? ""}
                     onChange={(e) => setEditService({ ...editService, base_price: parseFloat(e.target.value) })}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 text-sm text-[var(--portal-text)] focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
@@ -1241,7 +1293,7 @@ export default function AdminSeoDashboard() {
                     <select
                       value={schemaTypeSelected}
                       onChange={(e) => { setSchemaTypeSelected(e.target.value); }}
-                      className="rounded-lg border border-white/10 bg-[#0d1530] px-2 py-1 text-xs text-white focus:outline-none"
+                      className="rounded-lg border border-[var(--portal-border)] bg-transparent px-2 py-1 text-xs text-[var(--portal-text)] focus:outline-none"
                     >
                       {SCHEMA_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
@@ -1258,7 +1310,7 @@ export default function AdminSeoDashboard() {
                   onChange={(e) => setEditService({ ...editService, schema_markup: e.target.value })}
                   rows={7}
                   placeholder='{"@context": "https://schema.org", "@type": "Service", ...}'
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-xs text-green-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-xl border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-3 font-mono text-xs text-green-300 resize-none focus:border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
@@ -1305,11 +1357,23 @@ export default function AdminSeoDashboard() {
               </button>
               <button
                 onClick={() => setEditOpen(false)}
-                className="rounded-xl border border-white/10 px-6 py-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                className="rounded-xl border border-[var(--portal-border)] px-6 py-3 text-sm text-[var(--portal-text-muted)] hover:text-[var(--portal-text)] hover:bg-[var(--portal-surface)] transition-all"
               >
                 Cancel
               </button>
             </div>
+            </>
+            )}
+
+            {serviceEditTab === 'content' && (
+              <div className="mt-4">
+                <PageContentEditor 
+                  serviceId={editService.id}
+                  initialData={editService}
+                  onClose={() => setEditOpen(false)}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1319,8 +1383,8 @@ export default function AdminSeoDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="glass-card w-full max-w-sm p-8 text-center">
             <span className="text-4xl">⚠️</span>
-            <h2 className="mt-3 text-lg font-bold text-white">Deactivate Service?</h2>
-            <p className="mt-2 text-sm text-slate-400">This will mark the service as inactive. No data will be deleted.</p>
+            <h2 className="mt-3 text-lg font-bold text-[var(--portal-text)]">Deactivate Service?</h2>
+            <p className="mt-2 text-sm text-[var(--portal-text-muted)]">This will mark the service as inactive. No data will be deleted.</p>
             <div className="mt-6 flex gap-3">
               <button
                 id="confirm-deactivate-btn"
@@ -1331,7 +1395,7 @@ export default function AdminSeoDashboard() {
               </button>
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-slate-400 hover:bg-white/5 transition-all"
+                className="flex-1 rounded-xl border border-[var(--portal-border)] py-2.5 text-sm text-[var(--portal-text-muted)] hover:bg-[var(--portal-surface)] transition-all"
               >
                 Cancel
               </button>

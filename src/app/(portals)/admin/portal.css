@@ -1,0 +1,308 @@
+/*
+ * LocalServices AE — Admin Portal Design System
+ * Phase 1: Light, Airy, Minimalist Theme
+ * Font: Poppins | Palette: Slate 50 / White / Royal Blue #2563EB
+ */
+
+/* ── Portal-wide base ─────────────────────────────────────────────────── */
+.portal-root {
+  --portal-bg:          #F8FAFC;
+  --portal-surface:     #FFFFFF;
+  --portal-border:      #E2E8F0;
+  --portal-border-sm:   #F1F5F9;
+  --portal-primary:     #2563EB;
+  --portal-primary-muted: rgba(37, 99, 235, 0.08);
+  --portal-primary-hover: #1D4ED8;
+  --portal-text:        #1E293B;
+  --portal-text-muted:  #64748B;
+  --portal-text-light:  #94A3B8;
+  --portal-shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --portal-shadow-md:   0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --portal-radius:      0.75rem;
+  --portal-header-h:    64px;
+  --portal-sidebar-w:   240px;
+  font-family: var(--font-poppins, "Poppins"), system-ui, sans-serif;
+  background-color: var(--portal-bg);
+  color: var(--portal-text);
+}
+
+/* ── Sticky Header ─────────────────────────────────────────────────────── */
+.portal-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--portal-header-h);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--portal-border-sm);
+  box-shadow: var(--portal-shadow-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+}
+
+.portal-logo-text {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--portal-text);
+  letter-spacing: -0.02em;
+}
+
+.portal-logo-text span {
+  color: var(--portal-primary);
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────── */
+.portal-sidebar {
+  width: var(--portal-sidebar-w);
+  min-height: calc(100vh - var(--portal-header-h));
+  background: var(--portal-surface);
+  border-right: 1px solid var(--portal-border);
+  padding: 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--portal-shadow-sm);
+}
+
+.portal-sidebar-section {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--portal-text-light);
+  padding: 0.75rem 0.75rem 0.25rem;
+}
+
+/* ── Sidebar Nav Link ──────────────────────────────────────────────────── */
+.portal-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--portal-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.portal-nav-link:hover {
+  background: var(--portal-primary-muted);
+  color: var(--portal-primary);
+}
+
+.portal-nav-link.active {
+  background: var(--portal-primary-muted);
+  color: var(--portal-primary);
+  font-weight: 600;
+  /* Left blue accent bar */
+  box-shadow: inset 3px 0 0 var(--portal-primary);
+}
+
+.portal-nav-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.portal-nav-link:hover .portal-nav-icon,
+.portal-nav-link.active .portal-nav-icon {
+  opacity: 1;
+}
+
+/* ── Main content area ─────────────────────────────────────────────────── */
+.portal-main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.75rem 2rem;
+  background: var(--portal-bg);
+}
+
+/* ── Portal Card ───────────────────────────────────────────────────────── */
+.portal-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-border);
+  border-radius: var(--portal-radius);
+  box-shadow: var(--portal-shadow-sm);
+  padding: 1.5rem;
+}
+
+.portal-card:hover {
+  box-shadow: var(--portal-shadow-md);
+  transition: box-shadow 0.2s ease;
+}
+
+/* ── Portal Stat Card ──────────────────────────────────────────────────── */
+.portal-stat {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-border);
+  border-radius: var(--portal-radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  box-shadow: var(--portal-shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.portal-stat:hover {
+  box-shadow: var(--portal-shadow-md);
+  transform: translateY(-2px);
+}
+
+.portal-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--portal-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.portal-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--portal-text);
+  letter-spacing: -0.02em;
+  font-family: var(--font-poppins, "Poppins"), system-ui, sans-serif;
+}
+
+/* ── Portal Table ──────────────────────────────────────────────────────── */
+.portal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.portal-table th {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--portal-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: var(--portal-bg);
+  border-bottom: 1px solid var(--portal-border);
+}
+
+.portal-table td {
+  padding: 0.75rem 1rem;
+  color: var(--portal-text);
+  border-bottom: 1px solid var(--portal-border-sm);
+  vertical-align: middle;
+}
+
+.portal-table tr:hover td {
+  background: var(--portal-primary-muted);
+}
+
+/* ── Portal Input ──────────────────────────────────────────────────────── */
+.portal-input {
+  width: 100%;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--portal-border);
+  border-radius: 0.5rem;
+  background: var(--portal-surface);
+  font-size: 0.875rem;
+  font-family: var(--font-poppins, "Poppins"), sans-serif;
+  color: var(--portal-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.portal-input::placeholder {
+  color: var(--portal-text-light);
+}
+
+.portal-input:focus {
+  border-color: var(--portal-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* ── Portal Button ─────────────────────────────────────────────────────── */
+.portal-btn-primary {
+  background: var(--portal-primary);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-poppins, "Poppins"), sans-serif;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.portal-btn-primary:hover {
+  background: var(--portal-primary-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.portal-btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.portal-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--portal-border);
+  color: var(--portal-text-muted);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.portal-btn-ghost:hover {
+  background: var(--portal-bg);
+  color: var(--portal-text);
+}
+
+/* ── Badge Variants ────────────────────────────────────────────────────── */
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.portal-badge-blue   { background: rgba(37,99,235,0.1);  color: #1D4ED8; }
+.portal-badge-green  { background: rgba(22,163,74,0.1);  color: #16A34A; }
+.portal-badge-amber  { background: rgba(217,119,6,0.1);  color: #B45309; }
+.portal-badge-red    { background: rgba(220,38,38,0.1);  color: #DC2626; }
+.portal-badge-slate  { background: rgba(100,116,139,0.1);color: #475569; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+.portal-root ::-webkit-scrollbar        { width: 5px; height: 5px; }
+.portal-root ::-webkit-scrollbar-track  { background: transparent; }
+.portal-root ::-webkit-scrollbar-thumb  { background: var(--portal-border); border-radius: 9999px; }
+.portal-root ::-webkit-scrollbar-thumb:hover { background: var(--portal-text-light); }
+
+/* ── Role Badge in Header ──────────────────────────────────────────────── */
+.portal-role-chip {
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: var(--portal-primary-muted);
+  color: var(--portal-primary);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}

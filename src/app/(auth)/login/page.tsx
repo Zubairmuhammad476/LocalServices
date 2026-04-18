@@ -21,8 +21,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await handleLogin(email, password);
-      router.push("/");
+      const loggedInUser = await handleLogin(email, password);
+      
+      const role = loggedInUser?.role || 'Customer';
+      if (role === 'SuperAdmin') router.push("/admin/dashboard");
+      else if (role === 'FinanceAdmin') router.push("/admin/finance");
+      else if (role === 'ContentEditor') router.push("/admin/seo");
+      else if (role === 'Vendor') router.push("/provider");
+      else router.push("/customer");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Invalid credentials. Please try again.";

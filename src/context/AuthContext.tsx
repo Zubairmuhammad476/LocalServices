@@ -17,10 +17,11 @@ interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  handleLogin: (email: string, password: string) => Promise<void>;
+  userRole: UserRole | null;
+  handleLogin: (email: string, password: string) => Promise<any>;
   handleRegister: (data: RegisterPayload) => Promise<void>;
   handleLogout: () => Promise<void>;
-  hasRole: (role: UserRole) => boolean;
+  hasRole: (role: UserRole | UserRole[]) => boolean;
 }
 
 interface RegisterPayload {
@@ -63,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("auth_token", data.token);
     apiClient.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
     setUser(data.user);
+    return data.user;
   }, []);
 
   const handleRegister = useCallback(async (payload: RegisterPayload) => {
@@ -80,9 +82,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const hasRole = useCallback(
-    (role: UserRole) => user?.roles.includes(role) ?? false,
+    (role: UserRole | UserRole[]) => {
+      if (!user?.role) return false;
+      if (Array.isArray(role)) return role.includes(user.role);
+      return user.role === role;
+    },
     [user]
   );
+
+  const userRole: UserRole | null = (user?.role as UserRole) ?? null;
 
   return (
     <AuthContext.Provider
@@ -90,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
+        userRole,
         handleLogin,
         handleRegister,
         handleLogout,

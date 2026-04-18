@@ -1,6 +1,11 @@
-// ─── User & Auth Types ───────────────────────────────────────────────────────
+// ─── RBAC Role System ─────────────────────────────────────────────────────────
 
-export type UserRole = "admin" | "provider" | "customer";
+export type UserRole =
+  | 'SuperAdmin'
+  | 'ContentEditor'
+  | 'FinanceAdmin'
+  | 'Vendor'
+  | 'Customer';
 
 export interface User {
   id: number;
@@ -10,7 +15,10 @@ export interface User {
   avatarUrl?: string;
   emirate?: string;
   isActive: boolean;
-  roles: UserRole[];
+  /** New string-based role from the Phase 1 RBAC seeder */
+  role: UserRole;
+  /** Legacy Spatie array — kept for backward compat */
+  roles: string[];
   emailVerifiedAt: string | null;
   createdAt: string;
 }
