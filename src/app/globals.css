@@ -2007,3 +2007,373 @@ p, li, td, th, label, input, select, textarea, button, a {
   margin: 0;
 }
 
+/* ===========================================================================
+   HERO V2 — CENTRED LAYOUT MODIFIERS
+   One-line form design: desktop single-row, mobile stacked
+   =========================================================================== */
+
+/* Centred inner container — single column */
+.hero-v2-inner--centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  grid-template-columns: unset;
+  max-width: 72rem;
+  padding-top: 5rem;
+  padding-bottom: 4rem;
+  gap: 1.25rem;
+}
+
+/* Status pill centred */
+.hero-status-pill--center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* H1 — Poppins Bold (700), tighter tracking (-0.02em) = "Premium Tech" */
+.hero-v2-h1--center {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  font-size: clamp(1.85rem, 4.5vw, 3.5rem);
+  max-width: 52rem;
+}
+
+/* Description centred */
+.hero-v2-desc--center {
+  text-align: center;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Stats row centred */
+.hero-v2-stats--center {
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.hero-v2-stat--center {
+  align-items: center;
+  text-align: center;
+}
+
+/* ===========================================================================
+   HIF — HERO INLINE FORM  (one-line glassmorphic search bar)
+   Desktop: [ Service Input | divider | Location Select + GPS | Get Quotes ]
+   Mobile:  stacked vertically
+   =========================================================================== */
+
+/* Wrapper */
+.hif-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* Glassmorphic bar */
+.hif-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px 0 rgba(0, 35, 102, 0.18), 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .hif-bar {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    overflow: visible;
+    gap: 0;
+  }
+}
+
+/* Each input field wrapper */
+.hif-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 35, 102, 0.09);
+}
+
+@media (min-width: 768px) {
+  .hif-field {
+    border-bottom: none;
+    padding: 0;
+  }
+}
+
+/* Icon inside field */
+.hif-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: rgba(0, 35, 102, 0.35);
+  margin-left: 14px;
+  pointer-events: none;
+}
+
+/* Text input — Poppins Regular (400) / Medium (500) */
+.hif-input {
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #002366;
+  background: transparent;
+  border: none;
+  padding: 12px 12px 12px 8px;
+  flex: 1;
+  outline: none;
+  min-width: 0;
+}
+.hif-input::placeholder { color: #94A3B8; font-weight: 400; }
+
+/* Location select — Poppins Regular (400) */
+.hif-select {
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #002366;
+  background: transparent;
+  border: none;
+  padding: 12px 36px 12px 8px;
+  flex: 1;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394A3B8'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+.hif-select option { background: #002366; color: #fff; }
+
+/* Vertical divider between fields — desktop only */
+.hif-divider {
+  display: none;
+}
+@media (min-width: 768px) {
+  .hif-divider {
+    display: block;
+    width: 1px;
+    height: 30px;
+    background: rgba(0, 35, 102, 0.1);
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+}
+
+/* Detect-my-location button */
+.hif-detect-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: rgba(0, 35, 102, 0.45);
+  transition: color 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+  margin-right: 6px;
+  outline: none;
+}
+.hif-detect-btn:hover { color: #FF6B00; background: rgba(255,107,0,0.08); }
+.hif-detect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.hif-detect-icon { width: 18px; height: 18px; }
+
+/* Spinner */
+@keyframes hif-spin {
+  to { transform: rotate(360deg); }
+}
+.hif-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,35,102,0.2);
+  border-top-color: #FF6B00;
+  border-radius: 50%;
+  animation: hif-spin 0.7s linear infinite;
+}
+
+/* ── CTA Button — Poppins SemiBold (600) ─────────────────────────────── */
+.hif-cta {
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff;
+  background-color: #FF6B00;
+  padding: 14px 24px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+
+  /* Premium glow — makes it feel "pressable" */
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.42),
+              inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+@media (min-width: 768px) {
+  .hif-cta {
+    border-radius: 9px;
+    flex-shrink: 0;
+    padding: 14px 28px;
+  }
+}
+
+/* Full-width on mobile */
+@media (max-width: 767px) {
+  .hif-cta {
+    width: 100%;
+    border-radius: 0 0 12px 12px;
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+}
+
+.hif-cta:hover {
+  background-color: #E66000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255, 107, 0, 0.55),
+              inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.hif-cta:active { transform: translateY(0); }
+
+.hif-cta-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Typeahead dropdown ──────────────────────────────────────────────── */
+.hif-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #fff;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.16);
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.hif-sugg-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #002366;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  border-bottom: 1px solid #F1F5F9;
+}
+.hif-sugg-item:last-child { border-bottom: none; }
+.hif-sugg-item:hover,
+.hif-sugg-item--active { background: #FFF3EB; color: #FF6B00; }
+.hif-sugg-icon { width: 14px; height: 14px; color: #94A3B8; flex-shrink: 0; }
+.hif-sugg-item--active .hif-sugg-icon,
+.hif-sugg-item:hover .hif-sugg-icon { color: #FF6B00; }
+
+/* ── Trust ribbon — directly beneath the form bar ───────────────────── */
+.hif-trust-ribbon {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+
+.hif-trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+}
+
+.hif-trust-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* ===========================================================================
+   MOBILE STICKY "GET QUOTES" FLOATING BUTTON
+   Appears only on mobile after scrolling past the hero
+   =========================================================================== */
+.mobile-sticky-cta {
+  display: none;
+  position: fixed;
+  bottom: 4.5rem; /* above the sticky bar */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9980;
+  background: #FF6B00;
+  color: #fff;
+  font-family: var(--font-poppins, 'Poppins'), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(255,107,0,0.5);
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  animation: rippleOrange 2.5s ease-out infinite;
+}
+.mobile-sticky-cta:hover {
+  box-shadow: 0 6px 28px rgba(255,107,0,0.65);
+}
+.mobile-sticky-cta.visible {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+@media (min-width: 768px) {
+  .mobile-sticky-cta { display: none !important; }
+}
+
+
+

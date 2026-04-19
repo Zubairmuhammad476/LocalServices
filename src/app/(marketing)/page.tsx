@@ -5,7 +5,7 @@ import TestimonialCarousel from "@/components/ui/TestimonialCarousel";
 import ServicePowerGrid from "@/components/ui/ServicePowerGrid";
 import TrustRibbon from "@/components/ui/TrustRibbon";
 import HowItWorksSteps from "@/components/ui/HowItWorksSteps";
-import WhatsAppLeadForm from "@/components/ui/WhatsAppLeadForm";
+import HeroInlineForm from "@/components/ui/HeroInlineForm";
 import { getServices } from "@/lib/api";
 import type { Service } from "@/types/service";
 
@@ -146,50 +146,47 @@ export default async function HomePage() {
           <div className="hero-bg-overlay" />
         </div>
 
-        {/* Two-column layout: copy + form */}
-        <div className="hero-v2-inner">
+        {/* Centred hero content */}
+        <div className="hero-v2-inner hero-v2-inner--centered">
 
-          {/* LEFT COLUMN — H1, description, stats */}
-          <div className="hero-v2-copy">
-            {/* Live status pill */}
-            <div className="animate-fade-in hero-status-pill">
-              <span className="hero-status-dot" />
-              <strong>LocalServices UAE</strong>&nbsp;is currently active
-            </div>
-
-            {/* H1 — SEO optimised, renders first in DOM */}
-            <h1 id="hero-h1" className="animate-fade-up anim-delay-1 hero-v2-h1">
-              UAE Professional Service Marketplace: Verified Maintenance and Technical Solutions
-            </h1>
-
-            {/* Description — immediately after H1 in DOM */}
-            <p className="animate-fade-up anim-delay-2 hero-v2-desc">
-              The UAE Service Portal connects 8,500+ users with DED-licensed firms for 12 sectors like AC repair. Response time averages 20 minutes, if quotes are requested.
-            </p>
-
-            {/* Social proof micro-stats */}
-            <div className="animate-fade-up anim-delay-3 hero-v2-stats">
-              {[
-                { value: "8,500+", label: "Verified Users", icon: "👥" },
-                { value: "12", label: "Service Sectors", icon: "🏗️" },
-                { value: "20 min", label: "Avg. Response", icon: "⚡" },
-              ].map((s) => (
-                <div key={s.label} className="hero-v2-stat">
-                  <span className="hero-v2-stat-icon">{s.icon}</span>
-                  <p className="hero-stat-value">{s.value}</p>
-                  <p className="hero-stat-label">{s.label}</p>
-                </div>
-              ))}
-            </div>
+          {/* Status pill */}
+          <div className="animate-fade-in hero-status-pill hero-status-pill--center">
+            <span className="hero-status-dot" />
+            <strong>LocalServices UAE</strong>&nbsp;is currently active
           </div>
 
-          {/* RIGHT COLUMN — WhatsApp lead form */}
-          <div className="hero-v2-form-col">
-            <WhatsAppLeadForm />
+          {/* H1 — SEO optimised, Poppins Bold (700), letter-spacing -0.02em */}
+          <h1 id="hero-h1" className="animate-fade-up anim-delay-1 hero-v2-h1 hero-v2-h1--center">
+            UAE Professional Service Marketplace:<br />
+            <span className="hero-h1-highlight">Verified Maintenance &amp; Technical Solutions</span>
+          </h1>
+
+          {/* Description */}
+          <p className="animate-fade-up anim-delay-2 hero-v2-desc hero-v2-desc--center">
+            The UAE Service Portal connects 8,500+ users with DED-licensed firms for 12 sectors like AC repair. Response time averages 20 minutes, if quotes are requested.
+          </p>
+
+          {/* One-line search bar + trust ribbon */}
+          <HeroInlineForm />
+
+          {/* Social proof micro-stats */}
+          <div className="animate-fade-up anim-delay-4 hero-v2-stats hero-v2-stats--center">
+            {[
+              { value: "8,500+", label: "Verified Users", icon: "👥" },
+              { value: "12", label: "Service Sectors", icon: "🏗️" },
+              { value: "20 min", label: "Avg. Response", icon: "⚡" },
+            ].map((s) => (
+              <div key={s.label} className="hero-v2-stat hero-v2-stat--center">
+                <span className="hero-v2-stat-icon">{s.icon}</span>
+                <p className="hero-stat-value">{s.value}</p>
+                <p className="hero-stat-label">{s.label}</p>
+              </div>
+            ))}
           </div>
 
         </div>{/* /hero-v2-inner */}
       </section>
+
 
       {/* -- S2: IMMEDIATE TRUST RIBBON --------------------------------- */}
       <TrustRibbon />
