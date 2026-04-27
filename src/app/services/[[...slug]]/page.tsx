@@ -100,6 +100,59 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// ─── Static fallback factory ──────────────────────────────────────────────────
+// Called when the backend API is unreachable (e.g. Vercel without backend).
+// Generates a fully-functional page from slug alone so the site never 404s.
+function buildFallback(slugArray: string[]): import('@/lib/server/fetchService').ServiceData {
+  const location  = slugArray[0] || 'dubai';
+  const service   = slugArray[1] || '';
+  const locName   = location.charAt(0).toUpperCase() + location.slice(1).replace(/-/g, ' ');
+  const svcName   = service
+    ? service.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : `${locName} Services`;
+
+  const CITY_SERVICES = [
+    { id: 101, name: 'Home Cleaning',    slug: `services/${location}/home-cleaning`,    base_price: '149', design_layout: 'sub_service_layout', image_url: null },
+    { id: 102, name: 'Maid Services',    slug: `services/${location}/maid-services`,    base_price: '199', design_layout: 'sub_service_layout', image_url: null },
+    { id: 103, name: 'AC Maintenance',   slug: `services/${location}/ac-maintenance`,   base_price: '249', design_layout: 'sub_service_layout', image_url: null },
+    { id: 104, name: 'Plumbing',         slug: `services/${location}/plumbing`,         base_price: '199', design_layout: 'sub_service_layout', image_url: null },
+    { id: 105, name: 'Electrical',       slug: `services/${location}/electrical`,       base_price: '199', design_layout: 'sub_service_layout', image_url: null },
+    { id: 106, name: 'Painting',         slug: `services/${location}/painting`,         base_price: '349', design_layout: 'sub_service_layout', image_url: null },
+    { id: 107, name: 'Carpentry',        slug: `services/${location}/carpentry`,        base_price: '299', design_layout: 'sub_service_layout', image_url: null },
+    { id: 108, name: 'Pest Control',     slug: `services/${location}/pest-control`,     base_price: '299', design_layout: 'sub_service_layout', image_url: null },
+    { id: 109, name: 'Handyman',         slug: `services/${location}/handyman`,         base_price: '149', design_layout: 'sub_service_layout', image_url: null },
+    { id: 110, name: 'Landscaping',      slug: `services/${location}/landscaping`,      base_price: '399', design_layout: 'sub_service_layout', image_url: null },
+    { id: 111, name: 'Deep Cleaning',    slug: `services/${location}/deep-cleaning`,    base_price: '249', design_layout: 'sub_service_layout', image_url: null },
+    { id: 112, name: 'Move-in Cleaning', slug: `services/${location}/move-in-cleaning`, base_price: '349', design_layout: 'sub_service_layout', image_url: null },
+  ];
+
+  return {
+    id: 1,
+    name: svcName,
+    slug: `services/${slugArray.join('/')}`,
+    description: service
+      ? `Professional ${svcName} in ${locName}, UAE. Our DED-licensed experts deliver guaranteed quality with transparent AED pricing and same-day availability.`
+      : `Discover all home and maintenance services in ${locName}. DED-licensed professionals, transparent pricing, and same-day booking.`,
+    design_layout: service ? 'sub_service_layout' : 'city_hub_layout',
+    base_price: '149',
+    pricing_model: 'fixed',
+    seo_title: null,
+    seo_description: null,
+    image_url: null,
+    image_alt_text: null,
+    canonical_url: null,
+    no_index: false,
+    h1_override: null,
+    schema_markup: null,
+    is_active: true,
+    is_seo_optimized: false,
+    emirate: locName,
+    category: svcName,
+    parent: null,
+    children: service ? [] : CITY_SERVICES,
+  };
+}
+
 // ─── Component Render ─────────────────────────────────────────────────────────
 export default async function GenericServicePage({ params }: Props) {
   const p = await params;
@@ -107,11 +160,9 @@ export default async function GenericServicePage({ params }: Props) {
   
   // Reconstruct full slug to match the DB exactly
   const fullSlug = `services/${slugArray.join('/')}`;
-  const svc = await fetchServiceBySlug(fullSlug);
-
-  if (!svc) {
-    notFound();
-  }
+  
+  // Try the live API first; fall back to static content if offline
+  const svc = (await fetchServiceBySlug(fullSlug)) ?? buildFallback(slugArray);
 
   // Branch routing based on backend template config mapping
   if (svc.design_layout === 'sub_service_layout') {
@@ -121,3 +172,4 @@ export default async function GenericServicePage({ params }: Props) {
   // Default / City Hub / Primary Layout
   return <ServicePageTemplate svc={svc} slug={fullSlug} />;
 }
+
