@@ -315,7 +315,7 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
               <div id="svc-carousel" className="flex gap-5 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth no-scrollbar">
                 {subServices.slice(0, showAllServices ? undefined : 10).map((sub) => {
                   const cardImg = getCardImage(sub.slug);
-                  const desc = sub.description || `Professional ${sub.name} services in ${locationName}. DED-licensed, background-checked experts available same-day.`;
+                  const desc = `Professional ${sub.name} services in ${locationName}. DED-licensed, background-checked experts available same-day.`;
                   return (
                     <Link
                       key={sub.slug}
