@@ -79,9 +79,9 @@ const config: Config = {
 
       // ─── Font Family ───────────────────────────────────────────────────────
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["'Bricolage Grotesque'", "Inter", "sans-serif"],
-        mono: ["'JetBrains Mono'", "monospace"],
+        sans:    ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        display: ["var(--font-montserrat)", "Montserrat", "sans-serif"],
+        mono:    ["'JetBrains Mono'", "'Courier New'", "monospace"],
       },
 
       // ─── Border Radius ─────────────────────────────────────────────────────

@@ -1,27 +1,28 @@
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 
 interface ServiceCard {
   name: string;
   slug: string;
   icon: string;
-  price: string;
   bookings: string;
   imageUrl?: string;
+  active_image_url?: string;
   altTag: string;
+  desc?: string;
 }
 
-/* UAE-relevant Unsplash photos — no Western Western stock aesthetics */
 const IMAGE_MAP: Record<string, string> = {
-  'home-cleaning':   'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  'ac-maintenance':  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&q=80',
-  'plumbing':        'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&q=80',
-  'electrical':      'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&q=80',
-  'maid-services':   'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80',
-  'pest-control':    'https://images.unsplash.com/photo-1632922267756-9b71242b1592?w=600&q=80',
-  'handyman':        'https://images.unsplash.com/photo-1564182842519-8a3b2af3e228?w=600&q=80',
-  'landscaping':     'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80',
+  'home-cleaning':   '/assets/images/services/home-cleaning.webp',
+  'ac-maintenance':  '/assets/images/services/ac-maintenance.webp',
+  'plumbing':        '/assets/images/services/plumbing.webp',
+  'electrical':      '/assets/images/services/electrical.webp',
+  'maid-services':   '/assets/images/services/maid-services.webp',
+  'pest-control':    '/assets/images/services/pest-control.webp',
+  'handyman':        '/assets/images/services/handyman.webp',
+  'landscaping':     '/assets/images/services/landscaping.webp',
 };
 
 interface ServicePowerGridProps {
@@ -31,40 +32,43 @@ interface ServicePowerGridProps {
 export default function ServicePowerGrid({ services }: ServicePowerGridProps) {
   return (
     <div className="power-grid">
-      {services.map((service) => {
-        const imgSrc = IMAGE_MAP[service.slug] ?? IMAGE_MAP['home-cleaning'];
+      {services.map((service, idx) => {
+        // Use external URL as-is; for local assets always use the .webp version
+        const rawSrc = service.active_image_url || service.imageUrl || IMAGE_MAP[service.slug] || IMAGE_MAP['home-cleaning'];
+        const imgSrc = rawSrc.startsWith('http') ? rawSrc : rawSrc.replace(/\.(png|jpg|jpeg)$/i, '.webp');
+
         return (
           <a
             key={service.slug}
             href={`/services/dubai/${service.slug}`}
             className="power-card group"
-            aria-label={`Book ${service.name} — Starting from ${service.price}`}
+            aria-label={`Book ${service.name}`}
           >
-            {/* Photo */}
+            {/* Photo — Next.js Image for automatic optimization + lazy loading */}
             <div className="power-card-img-wrap">
-              <img
+              <Image
                 src={imgSrc}
                 alt={service.altTag}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="power-card-img"
-                loading="lazy"
+                loading={idx < 4 ? 'eager' : 'lazy'}
+                priority={idx < 2}
               />
-              {/* Price badge */}
-              <div className="power-card-price-badge">
-                <span className="text-[10px] font-medium text-slate-500">Starting from</span>
-                <span className="text-sm font-extrabold text-[#002366]">{service.price}</span>
-              </div>
-              {/* Bookings badge */}
-              <div className="power-card-bookings-badge">
-                🔥 {service.bookings} bookings
+              {/* Navy blue glassmorphism bookings badge */}
+              <div className="power-card-bookings-badge-glass">
+                {service.bookings} bookings
               </div>
             </div>
 
             {/* Content */}
-            <div className="power-card-content">
-              <div className="power-card-icon">{service.icon}</div>
+            <div className="power-card-content power-card-content--center">
               <h3 className="power-card-name">{service.name}</h3>
+              {service.desc && (
+                <p className="power-card-desc">{service.desc}</p>
+              )}
               <button
-                className="power-card-cta group-hover:bg-[#e05500]"
+                className="power-card-cta"
                 tabIndex={-1}
                 aria-hidden="true"
               >

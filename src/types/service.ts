@@ -22,6 +22,10 @@ export interface Service {
   schemaMarkup: Record<string, unknown> | null;
   isActive: boolean;
   isSeoOptimized: boolean;
+  active_image_url?: string | null;
+  ai_image_url?: string | null;
+  ai_prompt?: string | null;
+  use_ai_image?: boolean;
   parent?: Service;
   children?: Service[];
   createdAt: string;

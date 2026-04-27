@@ -1,25 +1,75 @@
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   formatBasePrice,
   type ServiceData,
 } from '@/lib/server/fetchService';
+import BookingModal from '@/components/ui/BookingModal';
+
+// ── Service card images from the project's public folder ──────────────────────
+const SERVICE_CARD_IMAGES: Record<string, string> = {
+  'cleaning':       '/assets/images/services/home-cleaning.webp',
+  'home-cleaning':  '/assets/images/services/home-cleaning.webp',
+  'maid':           '/assets/images/services/maid-services.webp',
+  'maid-services':  '/assets/images/services/maid-services.webp',
+  'ac':             '/assets/images/services/ac-maintenance.webp',
+  'ac-maintenance': '/assets/images/services/ac-maintenance.webp',
+  'plumbing':       '/assets/images/services/plumbing.webp',
+  'electrical':     '/assets/images/services/electrical.webp',
+  'painting':       '/assets/images/services/painting.webp',
+  'carpentry':      '/assets/images/services/carpentry.webp',
+  'pest-control':   '/assets/images/services/pest-control.webp',
+  'pest':           '/assets/images/services/pest-control.webp',
+  'handyman':       '/assets/images/services/handyman.webp',
+  'landscaping':    '/assets/images/services/landscaping.webp',
+};
+
+function getCardImage(slug: string): string {
+  const key = slug.split('/').pop() || '';
+  // Exact match first
+  if (SERVICE_CARD_IMAGES[key]) return SERVICE_CARD_IMAGES[key];
+  // Partial match
+  const partial = Object.keys(SERVICE_CARD_IMAGES).find(k => key.includes(k));
+  if (partial) return SERVICE_CARD_IMAGES[partial];
+  // Fallback cycle through available images
+  const fallbacks = Object.values(SERVICE_CARD_IMAGES);
+  const hash = key.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return fallbacks[hash % fallbacks.length];
+}
 
 export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; slug: string }) {
-  const displayName = svc.name ?? toTitle(slug);
-  const basePrice   = formatBasePrice(svc.base_price);
-  const subServices = svc.children ?? [];
+  const [isModalOpen, setIsModalOpen]       = useState(false);
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [openFaqIdx, setOpenFaqIdx]         = useState<number | null>(0);
+
+  const displayName      = svc.name ?? toTitle(slug);
+  const basePrice        = formatBasePrice(svc.base_price);
+  const subServices      = svc.children ?? [];
   const breadcrumbParent = svc.parent;
 
-  // Static review/trust data (in production: fetch from reviews API)
-  const reviews = getStaticReviews(displayName);
-  const faqs    = getStaticFaqs(displayName);
+  // Derived location for contextual text
+  const location     = slug.split('/')[1] || 'Dubai';
+  const locationName = location.charAt(0).toUpperCase() + location.slice(1);
 
-  // JSON-LD Schema
+  const faqs  = getStaticFaqs(displayName, locationName);
   const jsonLd = buildJsonLd(svc, displayName);
+
+  // Hero — use DB image or project local Dubai hero photo
+  const heroImage = svc.image_url || '/assets/images/services/dubai-hero.webp';
 
   return (
     <>
-      {/* ── JSON-LD ─────────────────────────────────────────────────────── */}
+      <BookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        serviceName={displayName}
+        location={locationName}
+      />
+
+      {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -28,120 +78,96 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
       <div className="min-h-screen bg-white text-slate-900">
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 1 — HERO
+            SECTION 1 — HERO: Full-width BG, centered content, NO right form
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30">
-          {/* Decorative blob */}
-          <div className="pointer-events-none absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-blue-100/60 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-[400px] w-[400px] rounded-full bg-cyan-100/40 blur-3xl" />
+        <section className="relative min-h-[620px] flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={heroImage}
+              alt={`${displayName} services in ${locationName}, UAE`}
+              fill
+              className="object-cover object-center"
+              priority
+              sizes="100vw"
+            />
+            {/* Dark gradient overlay — stronger for readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/75 via-slate-900/60 to-slate-900/80" />
+          </div>
 
-          <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 lg:px-8 lg:pt-14">
+          {/* Centered content */}
+          <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 sm:px-6 lg:px-8 text-center">
+
             {/* Breadcrumb */}
-            <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500">
-              <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <nav className="mb-6 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-blue-200/80">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="size-3" />
+              <Link href="/services" className="hover:text-white transition-colors">Services</Link>
               {breadcrumbParent && (
                 <>
-                  <ChevronRight className="size-3.5" />
-                  <Link href={`/${breadcrumbParent.slug}`} className="hover:text-blue-600 transition-colors capitalize">
+                  <ChevronRight className="size-3" />
+                  <Link href={`/${breadcrumbParent.slug}`} className="hover:text-white transition-colors capitalize">
                     {breadcrumbParent.name}
                   </Link>
                 </>
               )}
-              <ChevronRight className="size-3.5" />
-              <span className="font-medium text-slate-700">{displayName}</span>
+              <ChevronRight className="size-3" />
+              <span className="text-white">{displayName}</span>
             </nav>
 
-            <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-16 lg:items-center">
-              {/* Left content */}
-              <div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-xs font-semibold text-blue-700">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
-                  </span>
-                  Available Today across UAE
-                </div>
+            {/* Live availability pill */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-500/20 backdrop-blur-md border border-blue-400/30 px-5 py-2 text-xs font-bold text-blue-200">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-400" />
+              </span>
+              Available Today across {locationName}
+            </div>
 
-                <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-[3.25rem]">
-                  {displayName}{' '}
-                  <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                    Services
-                  </span>
-                  <br />in UAE
-                </h1>
+            {/* H1 */}
+            <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+              {displayName}{' '}
+              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                Services
+              </span>
+              <br />in {locationName}
+            </h1>
 
-                <p className="mt-5 max-w-xl text-lg text-slate-600 leading-relaxed">
-                  {svc.description ?? `Book verified ${displayName.toLowerCase()} professionals across Dubai, Abu Dhabi, Sharjah and all 7 UAE emirates. Background-checked providers, AED pricing, instant confirmation.`}
-                </p>
+            {/* Description */}
+            <p className="mt-6 mx-auto max-w-2xl text-lg text-blue-50/90 leading-relaxed">
+              {svc.description ??
+                `Premium ${displayName.toLowerCase()} solutions for ${locationName} residents. DED-licensed professionals, transparent AED pricing, and instant booking confirmation.`}
+            </p>
 
-                {/* Rating row */}
-                <div className="mt-6 flex flex-wrap items-center gap-5">
-                  <div className="flex items-center gap-1.5">
-                    <StarRating rating={4.8} />
-                    <span className="text-sm font-semibold text-slate-700">4.8</span>
-                    <span className="text-sm text-slate-400">(2,400+ reviews)</span>
-                  </div>
-                  <div className="h-4 w-px bg-slate-200" />
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                    <span>✅</span> Background checked
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                    <span>⚡</span> Same-day available
-                  </div>
-                </div>
-
-                {/* CTA Buttons */}
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link
-                    href="/register"
-                    className="rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
-                  >
-                    Book a Service →
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="rounded-full border-2 border-slate-200 px-7 py-3.5 text-sm font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600 transition-all"
-                  >
-                    Get Free Quote
-                  </Link>
-                </div>
-
-                {/* Trust pill row */}
-                <div className="mt-7 flex flex-wrap gap-2">
-                  {['No hidden fees', 'AED payments', '100% guarantee', 'Cancel anytime'].map((t) => (
-                    <span key={t} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      <span className="text-green-500">✓</span> {t}
-                    </span>
-                  ))}
-                </div>
+            {/* Trust row */}
+            <div className="mt-8 flex flex-wrap justify-center gap-6 items-center">
+              <div className="flex items-center gap-2">
+                <StarRating rating={4.9} />
+                <span className="text-white font-bold">4.9/5</span>
+                <span className="text-blue-200 text-sm">(2.4k+ Reviews)</span>
               </div>
-
-              {/* Right: Quick Book Card */}
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl shadow-slate-200/60">
-                <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Quick Booking</p>
-                <p className="mt-1 text-xl font-bold text-slate-900">Book in under 2 minutes</p>
-                <div className="mt-5 space-y-3">
-                  {[
-                    { icon: '📍', label: 'Location', placeholder: 'Dubai, Marina, JBR…' },
-                    { icon: '📅', label: 'Date & Time', placeholder: 'When do you need it?' },
-                  ].map((f) => (
-                    <div key={f.label} className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
-                      <span className="text-lg">{f.icon}</span>
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{f.label}</p>
-                        <p className="text-sm text-slate-500">{f.placeholder}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/register"
-                  className="mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/35 transition-all"
-                >
-                  Book Now — Starting at {basePrice}
-                </Link>
-                <p className="mt-3 text-center text-xs text-slate-400">No credit card required to book</p>
+              <div className="flex items-center gap-2 text-white text-sm">
+                <span className="text-blue-400">🛡️</span> DED Licensed
               </div>
+              <div className="flex items-center gap-2 text-white text-sm">
+                <span className="text-blue-400">⚡</span> Same-day Available
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-10 py-4 text-base font-extrabold text-white shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.04] transition-all"
+              >
+                Book a Service →
+              </button>
+              <Link
+                href="/contact"
+                className="rounded-full bg-white/10 backdrop-blur-md border border-white/25 px-10 py-4 text-base font-extrabold text-white hover:bg-white/20 transition-all"
+              >
+                Get Free Quote
+              </Link>
             </div>
           </div>
         </section>
@@ -149,18 +175,18 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         {/* ══════════════════════════════════════════════════════════════════
             SECTION 2 — STATS STRIP
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600">
-          <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <section className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600">
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {[
                 { value: '2,400+', label: 'Verified Providers' },
-                { value: '4.8★', label: 'Average Rating' },
+                { value: '4.9★',   label: 'Average Rating' },
                 { value: '< 15 min', label: 'Response Time' },
-                { value: 'All 7', label: 'Emirates Covered' },
+                { value: 'All 7',  label: 'Emirates Covered' },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className="text-2xl font-extrabold text-white">{s.value}</p>
-                  <p className="mt-0.5 text-xs text-blue-200">{s.label}</p>
+                  <p className="text-3xl font-extrabold text-white">{s.value}</p>
+                  <p className="mt-1 text-sm font-semibold text-blue-100 uppercase tracking-wider">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -168,64 +194,62 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 3 — SERVICE OVERVIEW (alternating layout)
+            SECTION 3 — SERVICE OVERVIEW (text left, real image right)
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="py-20">
+        <section className="py-24 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-20">
-              {/* Text side */}
+            <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+              {/* Text */}
               <div>
-                <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                  About This Service
+                <span className="inline-block rounded-full bg-blue-100 px-4 py-1.5 text-xs font-bold text-blue-700 uppercase tracking-widest mb-6">
+                  Expert Solutions
                 </span>
-                <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-                  UAE&apos;s Most Trusted<br />
-                  <span className="text-blue-600">{displayName} Experts</span>
+                <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl leading-tight">
+                  Premium {displayName} Solutions
+                  <br />
+                  <span className="text-blue-600">Tailored for {locationName}</span>
                 </h2>
-                <p className="mt-5 text-slate-600 leading-relaxed">
-                  LocalServices AE connects you directly with the best {displayName.toLowerCase()} professionals operating across the UAE. Every provider is rigorously vetted — identity verified, background checked, and certified in their trade.
+                <p className="mt-6 text-lg text-slate-600 leading-relaxed">
+                  From quick fixes to major projects, our platform connects you with the highest-rated {displayName.toLowerCase()} experts in {locationName}. Every professional is DED-licensed, background-checked, and equipped with the latest tools.
                 </p>
-                <p className="mt-3 text-slate-600 leading-relaxed">
-                  We operate in all 7 emirates and offer real-time booking with instant confirmation. No waiting, no uncertainty. Just professional service at transparent, AED-denominated prices.
-                </p>
-                <ul className="mt-6 grid grid-cols-2 gap-3">
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
                   {[
-                    'Identity Verified', 'Trade Certified',
-                    'Insured & Bonded', 'Customer Rated',
-                    'GPS Tracked', 'Digital Invoices',
+                    'Identity Verified Experts', 'Transparent AED Pricing',
+                    'Municipality Approved',     '24/7 Priority Support',
+                    'Satisfaction Guaranteed',   'Digital Service Reports',
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-slate-700">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 text-xs">✓</span>
-                      {item}
-                    </li>
+                    <div key={item} className="flex items-center gap-3">
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">✓</div>
+                      <span className="text-sm font-semibold text-slate-700">{item}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="mt-10 inline-flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-sm font-extrabold text-white shadow-lg hover:bg-blue-700 hover:scale-[1.02] transition-all"
+                >
+                  Book Now — Starting {basePrice}
+                </button>
               </div>
-              {/* Visual side */}
-              <div className="relative">
-                <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 p-[2px]">
-                  <div className="h-80 rounded-[14px] bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center">
-                    <div className="p-8 text-center">
-                      <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-600 text-4xl shadow-xl">
-                        🏠
-                      </div>
-                      <p className="text-2xl font-extrabold text-blue-700">{displayName}</p>
-                      <p className="mt-2 text-sm text-slate-500">Starting from {basePrice}</p>
-                      <div className="mt-4 flex justify-center gap-2">
-                        <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">Same-day</span>
-                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">Guaranteed</span>
-                      </div>
+
+              {/* Real Image */}
+              <div className="relative h-[480px] w-full rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="/assets/images/services/handyman.webp"
+                  alt={`${displayName} professional at work in ${locationName}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                {/* Floating trust card */}
+                <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-xl p-5 rounded-2xl shadow-xl border border-slate-100/80">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">👷</div>
+                    <div>
+                      <p className="text-sm font-extrabold text-slate-900">Verified Expert Guarantee</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Every professional is insured and DED licensed</p>
                     </div>
                   </div>
-                </div>
-                {/* Floating card */}
-                <div className="absolute -bottom-4 -left-4 rounded-xl bg-white p-4 shadow-xl border border-slate-100">
-                  <p className="text-xs text-slate-500">Next available slot</p>
-                  <p className="text-sm font-bold text-slate-800">Today, 2:00 PM</p>
-                </div>
-                <div className="absolute -right-4 -top-4 rounded-xl bg-white p-4 shadow-xl border border-slate-100">
-                  <p className="text-xs text-slate-500">Satisfaction rate</p>
-                  <p className="text-sm font-bold text-green-600">98.6%</p>
                 </div>
               </div>
             </div>
@@ -233,49 +257,68 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 4 — SUB-SERVICES / CATEGORIES GRID
+            SECTION 4 — SUB-SERVICES: Image Cards, max 8 initially
            ══════════════════════════════════════════════════════════════════ */}
         {subServices.length > 0 && (
-          <section className="bg-slate-50 py-20">
+          <section className="py-24 bg-slate-50">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="text-center">
-                <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                  What We Offer
-                </span>
-                <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-                  {displayName} Services Available
+              <div className="text-center mb-16">
+                <p className="section-label mb-3">Service Catalog</p>
+                <h2 className="section-h2-dark text-fluid-h2">
+                  Our specialized {displayName} offerings
                 </h2>
-                <p className="mx-auto mt-3 max-w-xl text-slate-500">
-                  Choose your exact service. Every option includes vetted professionals, transparent pricing, and a satisfaction guarantee.
+                <p className="mt-4 text-slate-500 max-w-2xl mx-auto">
+                  Click any card to see detailed pricing and book your service in {locationName}.
                 </p>
               </div>
 
-              <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {subServices.map((sub, i) => (
-                  <Link
-                    key={sub.id}
-                    href={`/${sub.slug}`}
-                    className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-slate-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300"
-                  >
-                    {/* Icon area */}
-                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-xl ${SERVICE_ICON_COLORS[i % SERVICE_ICON_COLORS.length]} shadow-sm`}>
-                      {SERVICE_ICONS[i % SERVICE_ICONS.length]}
-                    </div>
-                    <h3 className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{sub.name}</h3>
-                    {sub.base_price && (
-                      <p className="mt-1 text-sm text-cyan-600 font-semibold">
-                        From AED {parseFloat(sub.base_price).toFixed(0)}
-                      </p>
-                    )}
-                    <p className="mt-2 text-xs text-slate-400">Certified professionals</p>
-                    <span className="absolute bottom-4 right-4 text-slate-200 group-hover:text-blue-400 transition-colors text-lg">→</span>
-                  </Link>
-                ))}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {subServices.slice(0, showAllServices ? undefined : 8).map((sub) => {
+                  const cardImg = getCardImage(sub.slug);
+                  return (
+                    <Link
+                      key={sub.slug}
+                      href={`/${sub.slug}`}
+                      className="group relative overflow-hidden rounded-3xl aspect-[4/5] shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+                    >
+                      <Image
+                        src={cardImg}
+                        alt={`${sub.name} service in ${locationName}`}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/30 to-transparent" />
+
+                      {/* Content */}
+                      <div className="absolute inset-0 p-6 flex flex-col justify-end text-center">
+                        <h3 className="text-lg font-extrabold text-white mb-1.5 leading-tight">
+                          {sub.name}
+                        </h3>
+                        <p className="text-xs text-blue-200 font-semibold mb-4">
+                          Starting at AED {sub.base_price || '99'}
+                        </p>
+                        <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white border border-white/30 text-sm font-bold group-hover:bg-blue-600 group-hover:border-blue-600 transition-all">
+                          →
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
 
-              {subServices.length === 0 && (
-                <div className="mt-10 text-center text-slate-400">
-                  <p>All service packages available on booking. Contact us for custom requirements.</p>
+              {/* View More / Show Less */}
+              {subServices.length > 8 && (
+                <div className="mt-14 text-center">
+                  <button
+                    onClick={() => setShowAllServices(!showAllServices)}
+                    className="rounded-full bg-white border-2 border-slate-200 px-10 py-4 text-sm font-extrabold text-slate-800 hover:border-blue-500 hover:text-blue-600 shadow-sm transition-all"
+                  >
+                    {showAllServices
+                      ? 'Show Less'
+                      : `View All ${displayName} Services (+${subServices.length - 8} more)`}
+                  </button>
                 </div>
               )}
             </div>
@@ -283,261 +326,155 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         )}
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 5 — HOW IT WORKS
+            SECTION 5 — HOW IT WORKS: exact same design as homepage
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="py-20">
+        <section className="hiw-v3-section" aria-label={`How ${displayName} booking works in ${locationName}`}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-14">
-              <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Process</span>
-              <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">Book in 3 Simple Steps</h2>
-              <p className="mt-3 text-slate-500">From request to completion in under 60 minutes for most services.</p>
-            </div>
-            <div className="grid gap-8 sm:grid-cols-3">
-              {[
-                {
-                  step: '01',
-                  icon: '🔍',
-                  title: 'Choose Your Service',
-                  desc: 'Browse our catalog of 3,600+ verified {displayName} services. Filter by emirate, price, and availability.',
-                },
-                {
-                  step: '02',
-                  icon: '📅',
-                  title: 'Pick a Time Slot',
-                  desc: 'Select your preferred date and time. We have same-day and next-day slots available across all UAE emirates.',
-                },
-                {
-                  step: '03',
-                  icon: '✅',
-                  title: 'Relax & Get It Done',
-                  desc: 'A vetted professional arrives at your door. Pay securely in AED after the job is completed to your satisfaction.',
-                },
-              ].map((step, i) => (
-                <div key={step.step} className="relative">
-                  {/* Connector line */}
-                  {i < 2 && (
-                    <div className="absolute left-full top-10 hidden h-0.5 w-full -translate-x-8 bg-gradient-to-r from-blue-200 to-transparent sm:block" />
-                  )}
-                  <div className="relative rounded-2xl border border-slate-100 bg-white p-8 shadow-sm hover:shadow-md hover:border-blue-100 transition-all">
-                    <div className="mb-5 flex items-center gap-4">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-2xl shadow-lg shadow-blue-500/20">
-                        {step.icon}
-                      </div>
-                      <span className="text-4xl font-extrabold text-slate-100">{step.step}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800">{step.title}</h3>
-                    <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-                      {step.desc.replace('{displayName}', displayName.toLowerCase())}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            SECTION 6 — INLINE CTA BANNER
-           ══════════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 py-14">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(255,255,255,0.1),transparent_60%)]" />
-          <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-            <p className="text-sm font-semibold uppercase tracking-widest text-blue-200">Limited slots today</p>
-            <h2 className="mt-2 text-3xl font-extrabold text-white sm:text-4xl">
-              Book Your {displayName} Service Now
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-blue-100">
-              Join 50,000+ UAE residents who trust LocalServices AE. Starting at {basePrice} with a 100% satisfaction guarantee.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link
-                href="/register"
-                className="rounded-full bg-white px-8 py-3.5 text-sm font-bold text-blue-700 shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-              >
-                Book Now — It&apos;s Free to Sign Up
-              </Link>
-              <Link
-                href="/contact"
-                className="rounded-full border-2 border-white/40 px-8 py-3.5 text-sm font-bold text-white hover:bg-white/10 transition-all"
-              >
-                Request a Custom Quote
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            SECTION 7 — WHY CHOOSE US / TRUST PILLARS
-           ══════════════════════════════════════════════════════════════════ */}
-        <section className="bg-slate-50 py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-14 text-center">
-              <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Why LocalServices AE</span>
-              <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">Built for UAE Residents</h2>
-              <p className="mt-3 text-slate-500 max-w-lg mx-auto">The only platform built specifically for the UAE market — Arabized, licensed, and fully compliant.</p>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                {
-                  icon: '🛡️',
-                  color: 'bg-blue-50 border-blue-100',
-                  iconBg: 'bg-blue-600',
-                  title: 'Fully Vetted',
-                  desc: 'Criminal background checks, trade qualification verification, and insurance — every provider, every time.',
-                },
-                {
-                  icon: '💳',
-                  color: 'bg-cyan-50 border-cyan-100',
-                  iconBg: 'bg-cyan-600',
-                  title: 'AED Payments',
-                  desc: 'Pay in local currency via card, Apple Pay, or bank transfer. No forex fees, no hidden charges.',
-                },
-                {
-                  icon: '⚡',
-                  color: 'bg-green-50 border-green-100',
-                  iconBg: 'bg-green-600',
-                  title: 'Same-Day Service',
-                  desc: 'Most services available today. Book before noon for guaranteed afternoon slots in Dubai & Abu Dhabi.',
-                },
-                {
-                  icon: '♻️',
-                  color: 'bg-amber-50 border-amber-100',
-                  iconBg: 'bg-amber-500',
-                  title: '100% Guarantee',
-                  desc: 'Not satisfied? We&apos;ll send another professional free of charge, or issue a full refund. No questions asked.',
-                },
-              ].map((card) => (
-                <div key={card.title} className={`rounded-2xl border p-6 ${card.color} transition-all hover:shadow-md`}>
-                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-xl text-white ${card.iconBg} shadow-sm`}>
-                    {card.icon}
-                  </div>
-                  <h3 className="font-bold text-slate-800">{card.title}</h3>
-                  <p className="mt-2 text-sm text-slate-500 leading-relaxed" dangerouslySetInnerHTML={{ __html: card.desc }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            SECTION 8 — CUSTOMER TESTIMONIALS
-           ══════════════════════════════════════════════════════════════════ */}
-        <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-14 text-center">
-              <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Reviews</span>
-              <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-                Trusted by 50,000+ UAE Residents
-              </h2>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {reviews.map((rev, i) => (
-                <div key={i} className="relative rounded-2xl border border-slate-100 bg-white p-6 shadow-sm hover:shadow-md transition-all">
-                  <div className="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 p-2 shadow-lg">
-                    <span className="text-white text-xs">★★★★★</span>
-                  </div>
-                  <div className="mt-4 flex items-start gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 text-lg font-bold text-white shadow">
-                      {rev.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">{rev.name}</p>
-                      <p className="text-xs text-slate-400">{rev.location} · {rev.date}</p>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-sm text-slate-600 leading-relaxed italic">&ldquo;{rev.text}&rdquo;</p>
-                  <div className="mt-4 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                    {rev.service}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            SECTION 9 — EMIRATES COVERAGE
-           ══════════════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
-              <span className="inline-block rounded-full bg-blue-900/50 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-800">Coverage</span>
-              <h2 className="mt-4 text-3xl font-extrabold text-white sm:text-4xl">
-                {displayName} Services Across All UAE
-              </h2>
-              <p className="mt-3 text-slate-400 max-w-xl mx-auto">
-                We operate in every emirate with local providers who know the areas, regulations, and building types.
+            <div className="hiw-v3-header">
+              <p className="hiw-v3-label">Simple Process</p>
+              <h2 className="hiw-v3-title">How It Works</h2>
+              <p className="hiw-v3-subtitle">
+                Get your {displayName.toLowerCase()} done in 3 easy steps. Professional, reliable, and hassle-free in {locationName}.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7">
-              {EMIRATES.map((em) => (
-                <Link
-                  key={em.slug}
-                  href={`/services/${em.slug}`}
-                  className="group flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 p-4 text-center hover:bg-white/10 hover:border-blue-500/30 transition-all font-display"
-                >
-                  <span className="text-2xl mb-2">{em.flag}</span>
-                  <p className="text-xs font-semibold text-white">{em.name}</p>
-                  <p className="mt-1 text-[10px] text-slate-400 group-hover:text-blue-400 transition-colors">View services →</p>
-                </Link>
+
+            <div className="hiw-v3-grid">
+              {[
+                {
+                  num: '01',
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ width: 26, height: 26 }}>
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.35-4.35" />
+                    </svg>
+                  ),
+                  title: 'Choose Your Service',
+                  copy: `Select your exact ${displayName.toLowerCase()} package. Browse by price, availability, and neighborhood in ${locationName}.`,
+                },
+                {
+                  num: '02',
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ width: 26, height: 26 }}>
+                      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                  ),
+                  title: 'Get Matched Instantly',
+                  copy: 'Our smart system connects you with the highest-rated professional in your specific neighborhood within seconds.',
+                },
+                {
+                  num: '03',
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ width: 26, height: 26 }}>
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      <path d="m9 12 2 2 4-4" />
+                    </svg>
+                  ),
+                  title: 'Pay After Completion',
+                  copy: 'Relax while our experts do the work. Pay securely via Card, Apple Pay, or Cash — only when 100% satisfied.',
+                },
+              ].map((step) => (
+                <div key={step.num} className="hiw-v3-card">
+                  <p className="hiw-v3-num">{step.num}</p>
+                  <div className="hiw-v3-icon-box">{step.icon}</div>
+                  <h3 className="hiw-v3-card-title">{step.title}</h3>
+                  <p className="hiw-v3-card-copy">{step.copy}</p>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 10 — FAQ
+            SECTION 6 — FAQ: Same design as homepage but BLUE accent
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="py-20">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-12 text-center">
-              <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">FAQ</span>
-              <h2 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-                Common Questions About {displayName}
+        <section className="faq-section-blue" aria-label={`FAQ for ${displayName} in ${locationName}`}>
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <p className="faq-section-blue-label mb-3">Got Questions?</p>
+              <h2 className="section-h2-dark text-fluid-h2">
+                Common Questions About {locationName}
               </h2>
+              <p className="mx-auto mt-4 max-w-lg text-sm font-medium leading-relaxed text-slate-500">
+                Everything you need to know about {displayName.toLowerCase()} services in {locationName}.
+              </p>
             </div>
-            <div className="space-y-4">
-              {faqs.map((faq, i) => (
-                <details
-                  key={i}
-                  className="group rounded-xl border border-slate-100 bg-white shadow-sm hover:border-blue-100 transition-all open:shadow-md open:border-blue-200"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-semibold text-slate-800 select-none">
-                    {faq.q}
-                    <span className="ml-4 shrink-0 rounded-full bg-slate-100 p-1 group-open:bg-blue-100 group-open:text-blue-600 transition-all">
-                      <ChevronDown className="size-4 group-open:rotate-180 transition-transform" />
-                    </span>
-                  </summary>
-                  <div className="px-6 pb-5 pt-1 text-sm text-slate-600 leading-relaxed">
-                    {faq.a}
+
+            <div className="space-y-3">
+              {faqs.map((faq, idx) => {
+                const isOpen = openFaqIdx === idx;
+                return (
+                  <div
+                    key={faq.q}
+                    className={`faq-accordion-item-blue${isOpen ? ' faq-accordion-item-blue--open' : ''}`}
+                  >
+                    <button
+                      className="faq-accordion-summary-blue"
+                      onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
+                      aria-expanded={isOpen}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className={`faq-accordion-num-blue${isOpen ? ' faq-accordion-num-blue--open' : ''}`}>
+                          {String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <span className="faq-accordion-q">{faq.q}</span>
+                      </div>
+                      <span
+                        className="faq-accordion-chevron-blue"
+                        style={{
+                          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.3s ease',
+                        }}
+                        aria-hidden="true"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </span>
+                    </button>
+
+                    <div
+                      style={{
+                        maxHeight: isOpen ? '400px' : '0',
+                        overflow: 'hidden',
+                        transition: 'max-height 0.35s ease',
+                      }}
+                    >
+                      <div className="faq-accordion-body">{faq.a}</div>
+                    </div>
                   </div>
-                </details>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 11 — FINAL CTA
+            SECTION 7 — FINAL CTA
            ══════════════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-br from-blue-600 to-cyan-500 py-24">
-          <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-            <p className="text-blue-100 text-sm font-semibold uppercase tracking-widest">Ready to book?</p>
-            <h2 className="mt-3 text-4xl font-extrabold text-white sm:text-5xl">
-              Your Home Deserves<br />the Best
+        <section className="bg-[#002366] py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.2),transparent_70%)]" />
+          <div className="relative mx-auto max-w-4xl px-4 text-center">
+            <h2 className="text-4xl font-extrabold text-white mb-4">
+              Ready to get your {displayName} sorted?
             </h2>
-            <p className="mx-auto mt-5 max-w-lg text-blue-100 text-lg">
-              Join 50,000+ UAE residents. Book a {displayName.toLowerCase()} professional today with instant confirmation and a 100% money-back guarantee.
+            <p className="text-blue-200 text-lg mb-10 max-w-2xl mx-auto">
+              Join 50,000+ happy residents across the UAE. Same-day booking, transparent pricing, 100% guaranteed.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link
-                href="/register"
-                className="rounded-full bg-white px-9 py-4 text-base font-extrabold text-blue-700 shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
+            <div className="flex flex-wrap justify-center gap-4">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="rounded-full bg-white px-10 py-4 text-base font-extrabold text-blue-900 shadow-xl hover:scale-105 hover:shadow-2xl transition-all"
               >
-                Book a {displayName} Expert →
+                Book a Service Now
+              </button>
+              <Link
+                href="/contact"
+                className="rounded-full border-2 border-white/25 px-10 py-4 text-base font-bold text-white hover:bg-white/10 transition-all"
+              >
+                Contact Support
               </Link>
             </div>
-            <p className="mt-5 text-sm text-blue-200">No credit card required · Cancel anytime · 100% satisfaction guaranteed</p>
+            <p className="mt-8 text-blue-200/60 text-sm">🔒 No credit card required · AED payments · 100% satisfaction guaranteed</p>
           </div>
         </section>
 
@@ -546,133 +483,62 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
   );
 }
 
-// ─── Inline SVG Components (no extra dep) ─────────────────────────────────────
-function ChevronRight({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-    </svg>
-  );
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function toTitle(s: string) {
+  return s.replace(/-/g, ' ').split('/').pop()!.replace(/\b\w/g, (l) => l.toUpperCase());
 }
-function ChevronDown({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-    </svg>
-  );
-}
+
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5">
-      {[1,2,3,4,5].map((i) => (
-        <svg key={i} className={`h-4 w-4 ${i <= Math.round(rating) ? 'text-amber-400' : 'text-slate-200'}`} viewBox="0 0 20 20" fill="currentColor">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
+    <div className="flex gap-0.5 text-yellow-400 text-base">
+      {[...Array(5)].map((_, i) => (
+        <span key={i}>{i < Math.floor(rating) ? '★' : '☆'}</span>
       ))}
     </div>
   );
 }
 
-// ─── Static Data Helpers ──────────────────────────────────────────────────────
-const SERVICE_ICONS = ['🔧', '⚡', '🧹', '❄️', '🌿', '🎨', '🔑', '🚿', '🖥️', '🏗️', '🛡️', '📦'];
-const SERVICE_ICON_COLORS = [
-  'bg-blue-50 text-blue-600',
-  'bg-amber-50 text-amber-600',
-  'bg-green-50 text-green-600',
-  'bg-cyan-50 text-cyan-600',
-  'bg-purple-50 text-purple-600',
-  'bg-rose-50 text-rose-600',
-];
-const EMIRATES = [
-  { name: 'Dubai', slug: 'dubai', flag: '🏙️' },
-  { name: 'Abu Dhabi', slug: 'abu-dhabi', flag: '🕌' },
-  { name: 'Sharjah', slug: 'sharjah', flag: '🌆' },
-  { name: 'Ajman', slug: 'ajman', flag: '🏘️' },
-  { name: 'Ras Al Khaimah', slug: 'ras-al-khaimah', flag: '⛰️' },
-  { name: 'Fujairah', slug: 'fujairah', flag: '🌊' },
-  { name: 'Umm Al Quwain', slug: 'umm-al-quwain', flag: '🌴' },
-];
-
-function toTitle(slug: string) {
-  return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+function ChevronRight({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  );
 }
 
-function getStaticReviews(serviceName: string) {
-  return [
-    {
-      name: 'Ahmed Al Rashidi',
-      location: 'Dubai Marina',
-      date: 'March 2025',
-      text: `Exceptional ${serviceName.toLowerCase()} service. The team arrived on time, was professional, and the results exceeded my expectations.`,
-      service: `${serviceName} — Marina, Dubai`,
-    },
-    {
-      name: 'Fatima Al Zahra',
-      location: 'Abu Dhabi, Khalidiyah',
-      date: 'February 2025',
-      text: 'Best booking experience I\'ve had in the UAE. The app is easy to use, pricing is transparent, and the quality is consistently high.',
-      service: `${serviceName} — Abu Dhabi`,
-    },
-    {
-      name: 'James Henderson',
-      location: 'Sharjah, Al Nahda',
-      date: 'March 2025',
-      text: 'As an expat, finding reliable home services was a challenge before this platform. Now it\'s my go-to solution every time.',
-      service: `${serviceName} — Sharjah`,
-    },
-  ];
-}
-
-function getStaticFaqs(serviceName: string) {
-  return [
-    {
-      q: `How much does ${serviceName.toLowerCase()} cost in the UAE?`,
-      a: `Pricing varies by scope, emirate, and provider. Most ${serviceName.toLowerCase()} services start from AED 100–200 for standard jobs. You always see the final price before confirming — no surprises.`,
-    },
-    {
-      q: 'Are all service providers background checked?',
-      a: 'Yes. Every provider on our platform undergoes full identity verification, criminal background screening, and trade certification checks before their first booking.',
-    },
-    {
-      q: 'How quickly can I get a service?',
-      a: 'Many services are available same-day, especially in Dubai and Abu Dhabi. Simply choose a time slot during booking — we\'ll confirm within 15 minutes.',
-    },
-    {
-      q: 'What if I\'m not satisfied with the service?',
-      a: `All ${serviceName.toLowerCase()} bookings are covered by our 100% Satisfaction Guarantee. If you're not happy, we'll send another professional at no charge — or issue a full refund.`,
-    },
-    {
-      q: 'Can I book for another emirate?',
-      a: 'Absolutely. We operate across all 7 UAE emirates: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain.',
-    },
-  ];
-}
-
-function buildJsonLd(svc: ServiceData, displayName: string) {
-  return svc.schema_markup ?? {
+function buildJsonLd(svc: ServiceData, name: string) {
+  return {
     '@context': 'https://schema.org',
-    '@type': 'Service',
-    'name': displayName,
-    'description': svc.description ?? `Professional ${displayName} services across the UAE.`,
-    'provider': {
-      '@type': 'Organization',
-      'name': 'LocalServices AE',
-      'url': 'https://localservices.ae',
-    },
-    'areaServed': {
-      '@type': 'Country',
-      'name': 'United Arab Emirates',
-    },
-    'offers': svc.base_price ? {
-      '@type': 'Offer',
-      'priceCurrency': 'AED',
-      'price': svc.base_price,
-      'priceSpecification': { '@type': 'UnitPriceSpecification' },
-    } : undefined,
-    'aggregateRating': {
-      '@type': 'AggregateRating',
-      'ratingValue': '4.8',
-      'reviewCount': '2400',
-    },
+    '@type':    'Service',
+    name,
+    description: svc.description,
+    provider: { '@type': 'LocalBusiness', name: 'LocalServices AE', areaServed: 'UAE' },
+    offers:   { '@type': 'Offer', price: svc.base_price, priceCurrency: 'AED' },
   };
+}
+
+function getStaticFaqs(svcName: string, loc: string) {
+  return [
+    {
+      q: `How quickly can I book ${svcName} in ${loc}?`,
+      a: `You can book ${svcName} in ${loc} instantly through our platform. We offer same-day slots across all major areas. In Downtown ${loc}, JBR, and Marina, a professional can arrive within 60 minutes.`,
+    },
+    {
+      q: `Are your ${svcName} professionals in ${loc} licensed?`,
+      a: `Yes. All our ${loc}-based service providers are DED-licensed, municipality-approved, and undergo rigorous background checks before joining our platform. Credentials are available on request.`,
+    },
+    {
+      q: `What is the starting price for ${svcName} in ${loc}?`,
+      a: `${svcName} in ${loc} starts from AED 99, depending on the scope of work. We maintain fully transparent pricing — you receive a clear estimate before the work begins with zero hidden fees.`,
+    },
+    {
+      q: `Do you cover all areas of ${loc}?`,
+      a: `Yes! We cover 100% of ${loc} including Palm Jumeirah, Downtown, Marina, Arabian Ranches, JVC, Al Barsha, Deira, Bur Dubai and all surrounding suburbs. Wherever you are, we can reach you.`,
+    },
+    {
+      q: `Is there a warranty on ${svcName} services in ${loc}?`,
+      a: `We provide a 30-day service warranty on most ${svcName} jobs completed in ${loc}. If any issues arise from the work performed, we will dispatch a team back to resolve it at no extra cost.`,
+    },
+  ];
 }

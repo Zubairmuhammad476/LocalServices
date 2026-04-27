@@ -8,7 +8,6 @@ export default function UrgencyBar() {
   const [cityIndex, setCityIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  // Rotate city name every 4 seconds for live feeling
   useEffect(() => {
     const interval = setInterval(() => {
       setCityIndex((i) => (i + 1) % UAE_CITIES.length);
@@ -44,12 +43,6 @@ export default function UrgencyBar() {
             Call Now: 800-LOCAL
           </a>
         </span>
-      </div>
-
-      {/* Right side — live technician count */}
-      <div className="urgency-bar-live" aria-label="14 technicians currently online">
-        <span className="urgency-bar-dot" aria-hidden="true" />
-        <span>14 Technicians Online</span>
       </div>
     </div>
   );

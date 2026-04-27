@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import TestimonialCarousel from "@/components/ui/TestimonialCarousel";
 import ServicePowerGrid from "@/components/ui/ServicePowerGrid";
 import TrustRibbon from "@/components/ui/TrustRibbon";
 import HowItWorksSteps from "@/components/ui/HowItWorksSteps";
 import HeroInlineForm from "@/components/ui/HeroInlineForm";
+import FaqAccordion from "@/components/ui/FaqAccordion";
 import { getServices } from "@/lib/api";
 import type { Service } from "@/types/service";
 
@@ -27,14 +29,22 @@ export const metadata: Metadata = {
 
 /* ─── Static Data ───────────────────────────────────────────────────── */
 const FEATURED_SERVICES = [
-  { name: "Home Cleaning",   slug: "home-cleaning",   icon: "🧹", price: "AED 150", bookings: "12,400+", altTag: "Professional cleaner sanitizing a residential apartment in Dubai marina, UAE" },
-  { name: "AC Maintenance",  slug: "ac-maintenance",  icon: "❄️", price: "AED 120", bookings: "8,900+",  altTag: "Certified AC technician performing coil cleaning in a Dubai villa, UAE" },
-  { name: "Plumbing",        slug: "plumbing",        icon: "🔧", price: "AED 100", bookings: "6,200+",  altTag: "Certified plumber repairing a kitchen pipe in Abu Dhabi villa, UAE" },
-  { name: "Electrical",      slug: "electrical",      icon: "⚡", price: "AED 120", bookings: "5,400+",  altTag: "DEWA-approved electrician installing wiring in Sharjah apartment, UAE" },
-  { name: "Maid Services",   slug: "maid-services",   icon: "🏠", price: "AED 180", bookings: "9,800+",  altTag: "Background-checked maid providing housekeeping in Dubai villa, UAE" },
-  { name: "Pest Control",    slug: "pest-control",    icon: "🛡️", price: "AED 220", bookings: "4,200+",  altTag: "Municipality-approved pest control specialist treating Dubai apartment, UAE" },
-  { name: "Handyman",        slug: "handyman",        icon: "🛠️", price: "AED 80",  bookings: "7,600+",  altTag: "Handyman assembling IKEA furniture in Dubai apartment, UAE" },
-  { name: "Landscaping",     slug: "landscaping",     icon: "🌿", price: "AED 200", bookings: "3,100+",  altTag: "Landscaping specialist maintaining villa garden in Sharjah, UAE" },
+  { name: "Home Cleaning",   slug: "home-cleaning",   icon: "🧹", bookings: "12,400+", altTag: "Professional cleaner sanitizing a residential apartment in Dubai marina, UAE",
+    desc: "Deep-clean your villa or apartment to a hotel standard. HEPA-filtered vacuums, eco-safe products, and trained maids who respect your space." },
+  { name: "AC Maintenance",  slug: "ac-maintenance",  icon: "❄️", bookings: "8,900+",  altTag: "Certified AC technician performing coil cleaning in a Dubai villa, UAE",
+    desc: "Reduce your DEWA bill and breathe clean air. Certified technicians handle coil cleaning, refrigerant top-ups, and full system servicing." },
+  { name: "Plumbing",        slug: "plumbing",        icon: "🔧", bookings: "6,200+",  altTag: "Certified plumber repairing a kitchen pipe in Abu Dhabi villa, UAE",
+    desc: "Fix leaks, unblock drains, and replace fittings same-day. Our licensed plumbers arrive with parts — no second visit required." },
+  { name: "Electrical",      slug: "electrical",      icon: "⚡", bookings: "5,400+",  altTag: "DEWA-approved electrician installing wiring in Sharjah apartment, UAE",
+    desc: "DEWA-approved wiring, fault finding, and smart-home installation. All work is certified and insured for your complete peace of mind." },
+  { name: "Maid Services",   slug: "maid-services",   icon: "🏠", bookings: "9,800+",  altTag: "Background-checked maid providing housekeeping in Dubai villa, UAE",
+    desc: "Trusted, background-checked housekeepers on a weekly or monthly plan. Book in 2 minutes and confirm in under 2 minutes." },
+  { name: "Pest Control",    slug: "pest-control",    icon: "🛡️", bookings: "4,200+",  altTag: "Municipality-approved pest control specialist treating Dubai apartment, UAE",
+    desc: "Municipality-approved treatments that eliminate pests in one visit. Zero-recurrence guarantee within 60 days — or we return free." },
+  { name: "Handyman",        slug: "handyman",        icon: "🛠️", bookings: "7,600+",  altTag: "Handyman assembling IKEA furniture in Dubai apartment, UAE",
+    desc: "Furniture assembly, TV mounting, curtain fitting, and more. A skilled handyman who carries all tools and arrives on time." },
+  { name: "Landscaping",     slug: "landscaping",     icon: "🌿", bookings: "3,100+",  altTag: "Landscaping specialist maintaining villa garden in Sharjah, UAE",
+    desc: "Keep your garden lush in the UAE climate. Lawn mowing, tree trimming, irrigation setup, and desert-resilient planting." },
 ];
 
 const TESTIMONIALS = [
@@ -134,14 +144,14 @@ export default async function HomePage() {
       >
         {/* Optimised WebP hero background — /public/assets/images/homepage/hero.webp */}
         <div className="hero-bg" aria-hidden="true">
-          <img
-            src="/assets/images/homepage/hero.webp"
+          <Image
+            src="/assets/images/homepage/hero-v3.webp"
             alt="Verified technical maintenance services in Dubai and Abu Dhabi"
             className="hero-bg-img"
-            width={1200}
-            height={675}
-            fetchPriority="high"
-            decoding="async"
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
           />
           <div className="hero-bg-overlay" />
         </div>
@@ -169,20 +179,7 @@ export default async function HomePage() {
           {/* One-line search bar + trust ribbon */}
           <HeroInlineForm />
 
-          {/* Social proof micro-stats */}
-          <div className="animate-fade-up anim-delay-4 hero-v2-stats hero-v2-stats--center">
-            {[
-              { value: "8,500+", label: "Verified Users", icon: "👥" },
-              { value: "12", label: "Service Sectors", icon: "🏗️" },
-              { value: "20 min", label: "Avg. Response", icon: "⚡" },
-            ].map((s) => (
-              <div key={s.label} className="hero-v2-stat hero-v2-stat--center">
-                <span className="hero-v2-stat-icon">{s.icon}</span>
-                <p className="hero-stat-value">{s.value}</p>
-                <p className="hero-stat-label">{s.label}</p>
-              </div>
-            ))}
-          </div>
+
 
         </div>{/* /hero-v2-inner */}
       </section>
@@ -197,17 +194,19 @@ export default async function HomePage() {
         aria-label="Popular home services available across UAE"
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="power-grid-header">
-            <div>
+          <div className="power-grid-header power-grid-header--centered">
+            <div className="text-center">
               <p className="section-label mb-2">Most Booked</p>
               <h2 className="section-h2-dark text-fluid-h2">Our Top Home Services</h2>
-              <p className="mt-3 text-[var(--text-muted)] text-base max-w-lg">
+              <p className="mt-3 text-[var(--text-muted)] text-base mx-auto max-w-lg">
                 Transparent pricing. Vetted professionals. Same-day availability across all Emirates.
               </p>
             </div>
-            <Link href="/services/dubai" className="power-grid-view-all">
-              View all 3,619 services →
-            </Link>
+            <div className="text-center mt-6">
+              <Link href="/services" className="power-grid-view-all-btn">
+                View All Services →
+              </Link>
+            </div>
           </div>
 
           <ServicePowerGrid services={FEATURED_SERVICES} />
@@ -228,11 +227,14 @@ export default async function HomePage() {
             {/* Left — image side */}
             <div className="why-trust-image-side">
               <div className="why-trust-img-wrap">
-                <img
-                  src="https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                <Image
+                  src="/assets/images/verified-technician.webp"
                   alt="LocalServices AE technician showing verified ID badge in Dubai UAE"
                   className="why-trust-img"
+                  width={600}
+                  height={500}
                   loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 {/* Floating badge */}
                 <div className="why-trust-float-badge">
@@ -343,26 +345,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-3">
-            {FAQ_ITEMS.map((faq, idx) => (
-              <details key={faq.q} className="faq-accordion-item group">
-                <summary className="faq-accordion-summary">
-                  <div className="flex items-center gap-4">
-                    <span className="faq-accordion-num">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <span className="faq-accordion-q">{faq.q}</span>
-                  </div>
-                  <span className="faq-accordion-chevron group-open:rotate-180" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </span>
-                </summary>
-                <div className="faq-accordion-body">{faq.a}</div>
-              </details>
-            ))}
-          </div>
+          <FaqAccordion items={FAQ_ITEMS} />
 
           {/* Lead hook */}
           <div className="faq-lead-hook">
@@ -421,54 +404,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* -- S10: SEO FOOTER LINK MATRIX ------------------------------- */}
-      <section
-        className="seo-matrix-section"
-        aria-label="Browse services by location across UAE"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="seo-matrix-grid">
-            <div>
-              <h3 className="seo-matrix-col-title">Popular Services</h3>
-              <ul className="seo-matrix-list" role="list">
-                {SEO_SERVICES.map((s) => (
-                  <li key={s.label}>
-                    <Link href={s.href} className="seo-matrix-link">{s.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="seo-matrix-col-title">Service Locations</h3>
-              <ul className="seo-matrix-list" role="list">
-                {SEO_LOCATIONS.map((l) => (
-                  <li key={l.label}>
-                    <Link href={l.href} className="seo-matrix-link">{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="seo-matrix-col-title">All 7 Emirates</h3>
-              <ul className="seo-matrix-list" role="list">
-                {[
-                  { label: "Dubai Services",          href: "/services/dubai" },
-                  { label: "Abu Dhabi Services",       href: "/services/abu-dhabi" },
-                  { label: "Sharjah Services",         href: "/services/sharjah" },
-                  { label: "Ajman Services",           href: "/services/ajman" },
-                  { label: "Ras Al Khaimah Services",  href: "/services/ras-al-khaimah" },
-                  { label: "Fujairah Services",        href: "/services/fujairah" },
-                  { label: "Umm Al Quwain Services",   href: "/services/umm-al-quwain" },
-                ].map((e) => (
-                  <li key={e.label}>
-                    <Link href={e.href} className="seo-matrix-link">{e.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
     </div>
   );
