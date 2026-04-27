@@ -14,7 +14,7 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
     name: '',
     phone: '',
     email: '',
-    service: serviceName,
+    service: serviceName || '',
     date: '',
     notes: '',
   });
@@ -204,20 +204,37 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
                 </div>
               </div>
 
-              {/* Service */}
+              {/* Service Required — dropdown */}
               <div>
                 <label htmlFor="bm-service" className="block text-xs font-semibold text-blue-100 mb-1.5">
                   Service Required *
                 </label>
-                <input
+                <select
                   id="bm-service"
                   name="service"
-                  type="text"
                   required
                   value={formData.service}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                />
+                  className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40 transition-all appearance-none"
+                  style={{ colorScheme: 'dark' }}
+                >
+                  <option value="" style={{ background: '#1C5297' }}>Select a service...</option>
+                  {[
+                    'Home Cleaning',
+                    'Maid Services',
+                    'AC Maintenance',
+                    'Plumbing',
+                    'Electrical',
+                    'Painting',
+                    'Carpentry',
+                    'Pest Control',
+                    'Handyman',
+                    'Deep Cleaning',
+                    'Other',
+                  ].map((s) => (
+                    <option key={s} value={s} style={{ background: '#1C5297' }}>{s}</option>
+                  ))}
+                </select>
               </div>
 
               {/* Date — optional, full width */}

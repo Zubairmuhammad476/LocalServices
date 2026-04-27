@@ -255,15 +255,14 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-                {/* Floating trust card */}
-                <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-xl p-5 rounded-2xl shadow-xl border border-slate-100/80">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-2xl shadow-lg flex-shrink-0">👷</div>
-                    <div>
-                      <p className="text-sm font-extrabold text-slate-900">Verified Expert Guarantee</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Every professional is insured and DED licensed</p>
-                    </div>
-                  </div>
+                {/* Floating trust card — glassmorphism, centered */}
+                <div
+                  className="absolute bottom-6 left-6 right-6 rounded-2xl p-4 text-center shadow-xl"
+                  style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.35)' }}
+                >
+                  <div className="mx-auto mb-2 h-10 w-10 rounded-full bg-blue-600/90 flex items-center justify-center text-white font-bold text-base">✓</div>
+                  <p className="text-sm font-extrabold text-white">Verified Expert Guarantee</p>
+                  <p className="text-xs text-blue-100 mt-0.5">Every professional is insured and DED licensed</p>
                 </div>
               </div>
             </div>
@@ -276,53 +275,78 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         {subServices.length > 0 && (
           <section className="py-16 bg-slate-50">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              {/* Header row with View All on right */}
-              <div className="flex items-end justify-between mb-8 gap-4">
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-8 gap-4">
                 <div>
                   <p className="section-label mb-2">Service Catalog</p>
                   <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">
                     {displayName} Services in {locationName}
                   </h2>
                 </div>
-                {subServices.length > 10 && (
+                <div className="flex items-center gap-3 shrink-0">
+                  {subServices.length > 10 && (
+                    <button
+                      onClick={() => setShowAllServices(!showAllServices)}
+                      className="rounded-full border-2 border-blue-600 px-5 py-2 text-sm font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all"
+                    >
+                      {showAllServices ? 'Show Less' : `View All (${subServices.length})`}
+                    </button>
+                  )}
                   <button
-                    onClick={() => setShowAllServices(!showAllServices)}
-                    className="shrink-0 rounded-full border-2 border-blue-600 px-5 py-2 text-sm font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all"
+                    id="carousel-prev"
+                    onClick={() => { const el = document.getElementById('svc-carousel'); if(el) el.scrollBy({left: -el.clientWidth, behavior:'smooth'}); }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white border-2 border-slate-200 text-slate-600 shadow-sm hover:border-blue-600 hover:text-blue-600 hover:shadow-md transition-all"
+                    aria-label="Previous"
                   >
-                    {showAllServices ? 'Show Less' : `View All (${subServices.length})`}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                   </button>
-                )}
+                  <button
+                    id="carousel-next"
+                    onClick={() => { const el = document.getElementById('svc-carousel'); if(el) el.scrollBy({left: el.clientWidth, behavior:'smooth'}); }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
+                    aria-label="Next"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </div>
               </div>
 
-              {/* Horizontal scroll carousel */}
-              <div className="relative">
-                <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth no-scrollbar">
-                  {subServices.slice(0, showAllServices ? undefined : 10).map((sub) => {
-                    const cardImg = getCardImage(sub.slug);
-                    return (
-                      <Link
-                        key={sub.slug}
-                        href={`/${sub.slug}`}
-                        className="group relative shrink-0 w-52 overflow-hidden rounded-2xl snap-start shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-400"
-                        style={{ aspectRatio: '3/4' }}
-                      >
-                        <Image
-                          src={cardImg}
-                          alt={`${sub.name} in ${locationName}`}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-600"
-                          sizes="208px"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 p-4 text-center">
-                          <h3 className="text-sm font-extrabold text-white leading-tight mb-0.5">{sub.name}</h3>
-                          <p className="text-[11px] text-blue-200 font-semibold mb-2">AED {sub.base_price || '99'}+</p>
-                          <div className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-white/20 border border-white/30 text-white text-xs group-hover:bg-blue-600 group-hover:border-blue-600 transition-all">→</div>
+              {/* Carousel — 4 cards visible */}
+              <div id="svc-carousel" className="flex gap-5 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth no-scrollbar">
+                {subServices.slice(0, showAllServices ? undefined : 10).map((sub) => {
+                  const cardImg = getCardImage(sub.slug);
+                  const desc = sub.description || `Professional ${sub.name} services in ${locationName}. DED-licensed, background-checked experts available same-day.`;
+                  return (
+                    <Link
+                      key={sub.slug}
+                      href={`/${sub.slug}`}
+                      className="group relative shrink-0 overflow-hidden rounded-2xl snap-start shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-400"
+                      style={{ width: 'calc(25% - 15px)', minWidth: '200px', aspectRatio: '3/4' }}
+                    >
+                      <Image
+                        src={cardImg}
+                        alt={`${sub.name} in ${locationName}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-600"
+                        sizes="25vw"
+                      />
+                      {/* Default gradient — bottom name only */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent group-hover:opacity-0 transition-opacity duration-300" />
+                      <div className="absolute inset-x-0 bottom-0 p-4 text-center group-hover:opacity-0 transition-opacity duration-300">
+                        <h3 className="text-sm font-extrabold text-white leading-tight">{sub.name}</h3>
+                        <div className="mt-2 mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-white/20 border border-white/30 text-white text-xs group-hover:bg-blue-600 transition-all">→</div>
+                      </div>
+                      {/* Hover overlay — description */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-blue-900/95 via-blue-800/80 to-blue-700/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-5 text-center">
+                        <h3 className="text-base font-extrabold text-white mb-3 leading-tight">{sub.name}</h3>
+                        <p className="text-xs text-blue-100 leading-relaxed mb-4">{desc}</p>
+                        <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-1.5 text-xs font-bold text-white">
+                          Book Now →
                         </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -432,14 +456,14 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/30 to-transparent" />
-                <div className="absolute bottom-5 left-5 right-5 bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">✓</div>
-                    <div>
-                      <p className="text-sm font-extrabold text-slate-900">Satisfaction Guaranteed</p>
-                      <p className="text-xs text-slate-500">30-day warranty on all {displayName.toLowerCase()} work</p>
-                    </div>
-                  </div>
+                {/* Floating satisfaction card — glassmorphism centered */}
+                <div
+                  className="absolute bottom-5 left-5 right-5 rounded-2xl p-4 text-center shadow-xl"
+                  style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.35)' }}
+                >
+                  <div className="mx-auto mb-2 h-10 w-10 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-base border border-white/50">✓</div>
+                  <p className="text-sm font-extrabold text-white">Satisfaction Guaranteed</p>
+                  <p className="text-xs text-blue-100 mt-0.5">30-day warranty on all {displayName.toLowerCase()} work</p>
                 </div>
               </div>
             </div>
