@@ -26,9 +26,8 @@ const nextConfig: NextConfig = {
 
   // ─── Experimental perf flags ──────────────────────────────────────────────
   experimental: {
-    // Optimise CSS — reduces render-blocking stylesheet size
-    optimizeCss: true,
-    // Pre-render scroll-above-fold content
+    // Removed optimizeCss — requires 'critters' peer dep not installed
+    // optimizeCss: true,
     scrollRestoration: true,
   },
 
@@ -62,7 +61,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https://ik.imagekit.io https://images.pexels.com",
+              "img-src 'self' data: blob: https://ik.imagekit.io https://images.pexels.com https://res.cloudinary.com",
               "connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://darkviolet-pony-419059.hostingersite.com https://ik.imagekit.io https://upload.imagekit.io",
               "frame-ancestors 'none'",
             ].join("; "),

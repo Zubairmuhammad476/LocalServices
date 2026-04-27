@@ -2848,8 +2848,69 @@ button:disabled {
 }
 
 /* ---------------------------------------------------------------------------
-   SERVICE PAGE — FAQ SECTION BLUE (same design as homepage, blue not orange)
+   SERVICE PAGE ï¿½ FAQ SECTION BLUE (same design as homepage, blue not orange)
    --------------------------------------------------------------------------- */
+.faq-section-blue {
+  background: #f8faff;
+  padding: 5rem 0 4rem;
+  border-top: 1px solid #e2e8f0;
+}
+.faq-section-blue-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1d6ed8;
+  margin-bottom: 0.75rem;
+}
+.faq-accordion-item-blue {
+  background: #f0f6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.faq-accordion-item-blue--open {
+  border-color: #1d6ed8;
+  box-shadow: 0 4px 20px rgba(29,110,216,0.12);
+}
+.faq-accordion-summary-blue {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.faq-accordion-summary-blue:hover { background: #eff6ff; }
+.faq-accordion-num-blue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: #dbeafe;
+  color: #1d6ed8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.faq-accordion-num-blue--open {
+  background: #1d6ed8;
+  color: #ffffff;
+}
+.faq-accordion-chevron-blue {
+  color: #1d6ed8;
+  flex-shrink: 0;
+}
+
+/* SERVICE PAGE â€” FAQ SECTION BLUE (same structure as homepage, blue accent) */
 .faq-section-blue {
   background: #f8faff;
   padding: 5rem 0 4rem;
