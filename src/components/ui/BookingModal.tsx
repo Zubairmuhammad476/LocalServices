@@ -15,7 +15,6 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
     phone: '',
     email: '',
     service: serviceName,
-    location,
     date: '',
     notes: '',
   });
@@ -61,7 +60,7 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
         },
         body: JSON.stringify({
           ...formData,
-          _subject: `New Booking Request — ${formData.service} in ${formData.location}`,
+          _subject: `New Booking Request — ${formData.service} in ${location}`,
           _replyto: formData.email,
           to: 'zubaircs1993@gmail.com',
         }),
@@ -221,41 +220,21 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
                 />
               </div>
 
-              {/* Location + Date */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="bm-location" className="block text-xs font-semibold text-blue-100 mb-1.5">
-                    Your Area *
-                  </label>
-                  <select
-                    id="bm-location"
-                    name="location"
-                    required
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                    style={{ colorScheme: 'dark' }}
-                  >
-                    {UAE_LOCATIONS.map((loc) => (
-                      <option key={loc} value={loc} style={{ background: '#1C5297' }}>{loc}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="bm-date" className="block text-xs font-semibold text-blue-100 mb-1.5">
-                    Preferred Date
-                  </label>
-                  <input
-                    id="bm-date"
-                    name="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split('T')[0]}
-                    className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                    style={{ colorScheme: 'dark' }}
-                  />
-                </div>
+              {/* Date — optional, full width */}
+              <div>
+                <label htmlFor="bm-date" className="block text-xs font-semibold text-blue-100 mb-1.5">
+                  Preferred Date <span className="text-blue-300 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="bm-date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
+                  style={{ colorScheme: 'dark' }}
+                />
               </div>
 
               {/* Notes */}

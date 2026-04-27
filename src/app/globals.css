@@ -2970,3 +2970,4 @@ button:disabled {
   color: #1d6ed8;
   flex-shrink: 0;
 }
+/* Hide scrollbar for carousel */.no-scrollbar::-webkit-scrollbar { display: none; }.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
