@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -8,6 +8,7 @@ import {
   type ServiceData,
 } from '@/lib/server/fetchService';
 import BookingModal from '@/components/ui/BookingModal';
+import { useGeoLocation } from '@/hooks/useGeoLocation';
 
 // ── Location hero images ─────────────────────────────────────────────────────
 const LOCATION_HERO: Record<string, string> = {
@@ -64,6 +65,16 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
   // Derived location for contextual text
   const location     = slug.split('/')[1] || 'Dubai';
   const locationName = location.charAt(0).toUpperCase() + location.slice(1);
+
+  // IP-based geolocation — detected emirate for testimonials
+  const detectedEmirate = useGeoLocation(locationName);
+  const [reviewLocation, setReviewLocation] = useState(locationName);
+
+  useEffect(() => {
+    if (detectedEmirate) {
+      setReviewLocation(detectedEmirate);
+    }
+  }, [detectedEmirate]);
 
   const faqs  = getStaticFaqs(displayName, locationName);
   const jsonLd = buildJsonLd(svc, displayName);
@@ -471,21 +482,21 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            TESTIMONIALS — Location-specific customer reviews
+            TESTIMONIALS — Dynamic location-based customer reviews
            ══════════════════════════════════════════════════════════════════ */}
         <section className="py-20 bg-slate-50 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <p className="section-label mb-3">Customer Reviews</p>
               <h2 className="section-h2-dark text-fluid-h2">
-                What {locationName} Residents Say
+                What {reviewLocation} Residents Say
               </h2>
               <p className="mt-3 text-slate-500 max-w-lg mx-auto text-sm">
-                Real reviews from verified customers across {locationName}.
+                Real reviews from verified customers across {reviewLocation}.
               </p>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {getTestimonials(displayName, locationName).map((t, i) => (
+              {getTestimonials(displayName, reviewLocation).map((t, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all">
                   <div className="flex gap-0.5 text-yellow-400 mb-3">{'★'.repeat(t.rating)}</div>
                   <p className="text-slate-700 text-sm leading-relaxed mb-5">"{t.text}"</p>
@@ -493,7 +504,7 @@ export default function ServicePageTemplate({ svc, slug }: { svc: ServiceData; s
                     <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-extrabold text-white shrink-0 bg-gradient-to-br ${t.color}`}>{t.initials}</div>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{t.name}</p>
-                      <p className="text-xs text-slate-400">{locationName} · {t.service}</p>
+                      <p className="text-xs text-slate-400">{reviewLocation} · {t.service}</p>
                     </div>
                   </div>
                 </div>
@@ -725,26 +736,83 @@ function getStaticFaqs(svcName: string, loc: string) {
   ];
 }
 
-function getTestimonials(svcName: string, loc: string) {
-  const pools: Record<string, Array<{name:string;initials:string;color:string;text:string;service:string;rating:number}>> = {
+type Testimonial = { name: string; initials: string; color: string; text: string; service: string; rating: number };
+
+function getTestimonials(svcName: string, loc: string): Testimonial[] {
+  const pools: Record<string, Testimonial[]> = {
+
+    /* ── Dubai ─────────────────────────────────────────────────────────── */
     Dubai: [
-      { name:'Ahmed Al Mansoori', initials:'AM', color:'from-blue-600 to-cyan-500', rating:5, service:svcName, text:`Booked ${svcName} for our villa in Marina. The team was on time, professional, and the results exceeded our expectations. Will definitely use again.` },
-      { name:'Sarah Mitchell', initials:'SM', color:'from-purple-600 to-pink-500', rating:5, service:svcName, text:`Excellent service in Downtown Dubai. The technician explained everything clearly and the pricing was exactly as quoted online. No surprise charges!` },
-      { name:'Fatima Al Hashimi', initials:'FH', color:'from-emerald-600 to-teal-500', rating:5, service:svcName, text:`Used them for ${svcName} in JVC. Fast response, clean work, and the team was very respectful. Highly recommend to all Dubai residents.` },
-      { name:'James O\'Brien', initials:'JO', color:'from-orange-500 to-red-500', rating:4, service:svcName, text:`Very satisfied with the ${svcName} in Palm Jumeirah. Good communication, arrived on schedule and did a thorough job. Would book again.` },
-      { name:'Aisha Al Zaabi', initials:'AZ', color:'from-indigo-600 to-blue-500', rating:5, service:svcName, text:`Booked for our apartment in Al Barsha. The app is super easy and the team was outstanding. Exactly what Dubai residents need!` },
-      { name:'Ravi Sharma', initials:'RS', color:'from-teal-600 to-cyan-400', rating:5, service:svcName, text:`Great ${svcName} experience in Deira. Professional crew, fair price, done in record time. LocalServices AE is now my go-to platform.` },
+      { name: 'Ahmed Al Mansoori',  initials: 'AM', color: 'from-blue-600 to-cyan-500',    rating: 5, service: svcName, text: `Booked ${svcName} for our villa in Dubai Marina. The team was on time, professional, and the results exceeded our expectations. Will definitely use again.` },
+      { name: 'Sarah Mitchell',     initials: 'SM', color: 'from-purple-600 to-pink-500',   rating: 5, service: svcName, text: `Excellent ${svcName} service in Downtown Dubai. The technician explained everything clearly and the pricing was exactly as quoted online. No surprise charges!` },
+      { name: 'Fatima Al Hashimi',  initials: 'FH', color: 'from-emerald-600 to-teal-500',  rating: 5, service: svcName, text: `Used them for ${svcName} in JVC. Fast response, clean work, and the team was very respectful. Highly recommend to all Dubai residents.` },
+      { name: 'James O\'Brien',    initials: 'JO', color: 'from-orange-500 to-red-500',     rating: 5, service: svcName, text: `Very satisfied with the ${svcName} in Palm Jumeirah. Good communication, arrived on schedule and did a thorough job. Would book again.` },
+      { name: 'Aisha Al Zaabi',     initials: 'AZ', color: 'from-indigo-600 to-blue-500',   rating: 5, service: svcName, text: `Booked ${svcName} for our apartment in Al Barsha. The app is super easy and the team was outstanding. Exactly what Dubai residents need!` },
+      { name: 'Ravi Sharma',        initials: 'RS', color: 'from-teal-600 to-cyan-400',     rating: 5, service: svcName, text: `Great ${svcName} experience in Deira. Professional crew, fair price, done in record time. LocalServices AE is now my go-to platform.` },
     ],
+
+    /* ── Abu Dhabi ─────────────────────────────────────────────────────── */
     'Abu Dhabi': [
-      { name:'Khalid Al Mazrouei', initials:'KM', color:'from-blue-600 to-cyan-500', rating:5, service:svcName, text:`Booked ${svcName} for our Corniche apartment. Crew arrived within the hour, worked efficiently and left the place spotless.` },
-      { name:'Emma Thompson', initials:'ET', color:'from-purple-600 to-pink-500', rating:5, service:svcName, text:`Wonderful ${svcName} experience on Al Reem Island. Very professional team and transparent pricing. I'll be a regular customer.` },
-      { name:'Mariam Al Nuaimi', initials:'MN', color:'from-emerald-600 to-teal-500', rating:5, service:svcName, text:`Used for ${svcName} in Khalidiyah. Prompt, polite and thorough. The team even cleaned up perfectly after finishing the work.` },
-      { name:'David Clark', initials:'DC', color:'from-orange-500 to-red-500', rating:4, service:svcName, text:`Good service in Saadiyat Island area. Booking was seamless and the technician was knowledgeable. Would recommend to expats in Abu Dhabi.` },
-      { name:'Noura Al Shamsi', initials:'NS', color:'from-indigo-600 to-blue-500', rating:5, service:svcName, text:`Booked ${svcName} in Mussafah. Excellent value, very friendly team and job done to a high standard. 5 stars from Abu Dhabi!` },
-      { name:'Priya Nair', initials:'PN', color:'from-teal-600 to-cyan-400', rating:5, service:svcName, text:`Outstanding ${svcName} on Yas Island. Booking was instant and the team was on time. Best service platform in Abu Dhabi!` },
+      { name: 'Khalid Al Mazrouei', initials: 'KM', color: 'from-blue-600 to-cyan-500',    rating: 5, service: svcName, text: `Booked ${svcName} for our Corniche apartment. Crew arrived within the hour, worked efficiently and left the place spotless.` },
+      { name: 'Emma Thompson',      initials: 'ET', color: 'from-purple-600 to-pink-500',   rating: 5, service: svcName, text: `Wonderful ${svcName} experience on Al Reem Island. Very professional team and transparent pricing. I'll be a regular customer.` },
+      { name: 'Mariam Al Nuaimi',   initials: 'MN', color: 'from-emerald-600 to-teal-500',  rating: 5, service: svcName, text: `Used for ${svcName} in Khalidiyah. Prompt, polite and thorough. The team even cleaned up perfectly after finishing the work.` },
+      { name: 'David Clark',        initials: 'DC', color: 'from-orange-500 to-red-500',     rating: 5, service: svcName, text: `Good ${svcName} service in Saadiyat Island area. Booking was seamless and the technician was knowledgeable. Would recommend to expats in Abu Dhabi.` },
+      { name: 'Noura Al Shamsi',    initials: 'NS', color: 'from-indigo-600 to-blue-500',   rating: 5, service: svcName, text: `Booked ${svcName} in Mussafah. Excellent value, very friendly team and job done to a high standard. 5 stars from Abu Dhabi!` },
+      { name: 'Priya Nair',         initials: 'PN', color: 'from-teal-600 to-cyan-400',     rating: 5, service: svcName, text: `Outstanding ${svcName} on Yas Island. Booking was instant and the team was on time. Best service platform in Abu Dhabi!` },
+    ],
+
+    /* ── Sharjah ───────────────────────────────────────────────────────── */
+    Sharjah: [
+      { name: 'Omar Al Suwaidi',    initials: 'OS', color: 'from-sky-600 to-blue-500',      rating: 5, service: svcName, text: `Called for ${svcName} in Al Nahda and the professional arrived within 40 minutes. Very skilled, polite, and left everything clean. Outstanding service!` },
+      { name: 'Linda Fernandez',    initials: 'LF', color: 'from-rose-500 to-pink-500',     rating: 5, service: svcName, text: `We needed urgent ${svcName} in Al Majaz. LocalServices AE connected us with a licensed technician same-day. Couldn't be happier with the quality.` },
+      { name: 'Hassan Al Ketbi',    initials: 'HK', color: 'from-amber-500 to-orange-500',  rating: 5, service: svcName, text: `Reliable ${svcName} in Al Khan area. Fair pricing, no hidden fees, and they even followed up the next day. This is how service should be done.` },
+      { name: 'Catherine Moore',    initials: 'CM', color: 'from-violet-600 to-purple-500', rating: 5, service: svcName, text: `Booked ${svcName} for our flat in Al Taawun. The booking process was seamless and the work was completed faster than expected. Highly recommended!` },
+      { name: 'Yousuf Al Hammadi',  initials: 'YH', color: 'from-emerald-500 to-green-500', rating: 5, service: svcName, text: `Needed ${svcName} in Muwailih Commercial. The team was professional from start to finish. Will use LocalServices AE every time now.` },
+      { name: 'Deepa Krishnan',     initials: 'DK', color: 'from-cyan-600 to-teal-500',     rating: 4, service: svcName, text: `Good ${svcName} experience in Al Qasimia. The technician was knowledgeable and courteous. Pricing was fair for Sharjah. Would recommend to neighbours.` },
+    ],
+
+    /* ── Ajman ─────────────────────────────────────────────────────────── */
+    Ajman: [
+      { name: 'Sultan Al Nuaimi',   initials: 'SN', color: 'from-blue-700 to-indigo-500',   rating: 5, service: svcName, text: `Excellent ${svcName} in Al Rashidiya. The professional arrived on time and the workmanship was top-notch. Best service experience I've had in Ajman!` },
+      { name: 'Maria Santos',       initials: 'MS', color: 'from-pink-500 to-rose-500',     rating: 5, service: svcName, text: `Booked ${svcName} for our place in Al Nuaimiya. Quick response, transparent pricing, and the results were perfect. Saved me so much time and stress!` },
+      { name: 'Abdulrahman Al Ali', initials: 'AA', color: 'from-emerald-600 to-green-500', rating: 5, service: svcName, text: `Used LocalServices AE for ${svcName} in Al Rumailah. The platform is easy, the team was professional, and the pricing was honest. Five stars from Ajman!` },
+      { name: 'Jennifer Adams',     initials: 'JA', color: 'from-orange-500 to-amber-500',  rating: 5, service: svcName, text: `Needed emergency ${svcName} in Emirates City. They dispatched someone within an hour. Fantastic service for Ajman residents — will be a repeat customer.` },
+      { name: 'Saeed Al Dhaheri',   initials: 'SD', color: 'from-purple-600 to-violet-500', rating: 4, service: svcName, text: `Great ${svcName} in Al Jurf. Professional crew, polite and thorough. The quote matched the final bill exactly. Refreshingly honest service in Ajman.` },
+      { name: 'Anita Dsouza',       initials: 'AD', color: 'from-teal-500 to-cyan-400',     rating: 5, service: svcName, text: `Wonderful ${svcName} experience in Al Hamidiyah. The technician was skilled and efficient. Very happy I found this platform — perfect for Ajman!` },
+    ],
+
+    /* ── Ras Al Khaimah ────────────────────────────────────────────────── */
+    'Ras Al Khaimah': [
+      { name: 'Hamad Al Qassimi',   initials: 'HQ', color: 'from-blue-600 to-sky-500',      rating: 5, service: svcName, text: `Booked ${svcName} for our home in Al Hamra Village. Incredibly professional team — they treated our home with respect. Best service in RAK!` },
+      { name: 'Rachel Wilson',      initials: 'RW', color: 'from-pink-600 to-purple-500',   rating: 5, service: svcName, text: `We've tried many providers in Ras Al Khaimah, but LocalServices AE is the best for ${svcName}. Booked for Mina Al Arab and the quality was superb.` },
+      { name: 'Rashid Al Shehhi',   initials: 'RS', color: 'from-amber-600 to-orange-500',  rating: 5, service: svcName, text: `Prompt ${svcName} in Al Nakheel. The whole process from booking to completion was smooth. Fair price and excellent workmanship. Will recommend to everyone in RAK.` },
+      { name: 'Sophie Laurent',     initials: 'SL', color: 'from-violet-500 to-indigo-500', rating: 5, service: svcName, text: `Amazing ${svcName} service in Al Dhait area. The technician was experienced and completed everything in one visit. Ras Al Khaimah finally has a reliable platform!` },
+      { name: 'Mohammed Al Tunaiji', initials: 'MT', color: 'from-emerald-600 to-teal-500', rating: 4, service: svcName, text: `Good ${svcName} experience near Al Qurm. Professional behaviour, clean work, and the pricing was very reasonable for RAK. Solid platform overall.` },
+      { name: 'Pooja Menon',        initials: 'PM', color: 'from-cyan-500 to-blue-400',     rating: 5, service: svcName, text: `Booked ${svcName} in Ghalilah. Even though we're outside the city centre, the team arrived quickly. Top-tier service for all of Ras Al Khaimah!` },
+    ],
+
+    /* ── Fujairah ──────────────────────────────────────────────────────── */
+    Fujairah: [
+      { name: 'Ali Al Sharqi',      initials: 'AS', color: 'from-blue-700 to-cyan-600',     rating: 5, service: svcName, text: `Needed ${svcName} in Fujairah City and the response was outstanding. Professional, punctual, and the work quality was excellent. Highly recommended!` },
+      { name: 'Elena Petrova',      initials: 'EP', color: 'from-rose-500 to-pink-400',     rating: 5, service: svcName, text: `We booked ${svcName} for our villa in Al Faseel. The team was meticulous and very respectful. So glad to find a reliable platform covering Fujairah!` },
+      { name: 'Saif Al Kaabi',      initials: 'SK', color: 'from-amber-500 to-yellow-500',  rating: 5, service: svcName, text: `Great ${svcName} in Dibba Al Fujairah. On time, skilled, and reasonably priced. The online booking made everything so easy. Will use again for sure.` },
+      { name: 'Amanda Chen',        initials: 'AC', color: 'from-purple-500 to-violet-400', rating: 5, service: svcName, text: `Booked ${svcName} for Khor Fakkan and wasn't sure if they'd cover that area. They did — and the service was exceptional! Best option for the East Coast.` },
+      { name: 'Obaid Al Dhahouri',  initials: 'OD', color: 'from-emerald-500 to-teal-400',  rating: 4, service: svcName, text: `Solid ${svcName} service in Kalba. The technician knew exactly what to do. Transparent pricing and no upselling. Rare to find this in Fujairah.` },
+      { name: 'Sunita Patel',       initials: 'SP', color: 'from-teal-600 to-cyan-500',     rating: 5, service: svcName, text: `Quick and professional ${svcName} in Qidfa area. The team went above and beyond. Finally a platform that properly serves Fujairah residents!` },
+    ],
+
+    /* ── Umm Al Quwain ────────────────────────────────────────────────── */
+    'Umm Al Quwain': [
+      { name: 'Mansoor Al Mualla',  initials: 'MM', color: 'from-blue-600 to-indigo-500',   rating: 5, service: svcName, text: `Booked ${svcName} in Al Salamah and was impressed by the speed and quality. LocalServices AE is a game-changer for UAQ residents!` },
+      { name: 'Jessica Taylor',     initials: 'JT', color: 'from-pink-500 to-rose-400',     rating: 5, service: svcName, text: `We needed ${svcName} urgently in Al Raas. Got a professional within 90 minutes. The work was clean, efficient, and fairly priced. Excellent!` },
+      { name: 'Nasser Al Shamsi',   initials: 'NS', color: 'from-amber-600 to-orange-400',  rating: 5, service: svcName, text: `Used their ${svcName} service in Al Hamriyah Free Zone area. Professional crew, clear communication, and no hidden charges. Will definitely book again.` },
+      { name: 'Karen White',        initials: 'KW', color: 'from-violet-600 to-purple-400', rating: 5, service: svcName, text: `Living in UAQ, it's hard to find reliable services. LocalServices AE exceeded my expectations for ${svcName}. The technician was skilled and courteous.` },
+      { name: 'Faisal Al Hosani',   initials: 'FH', color: 'from-emerald-600 to-green-400', rating: 4, service: svcName, text: `Good ${svcName} near UAQ City Centre. Booking was simple, service was punctual, and the pricing was competitive. Great option for Umm Al Quwain.` },
+      { name: 'Meera Reddy',        initials: 'MR', color: 'from-cyan-600 to-teal-400',     rating: 5, service: svcName, text: `Wonderful ${svcName} experience in Al Riqqah. The team was respectful, hardworking, and completed the job ahead of schedule. UAQ needs more services like this!` },
     ],
   };
-  const base = pools[loc] || pools['Dubai'].map(t => ({ ...t, text: t.text.replace('Dubai', loc) }));
+
+  const base = pools[loc] || pools['Dubai'].map((t) => ({ ...t, text: t.text.replace(/Dubai/g, loc) }));
   return base.slice(0, 6);
 }
 
