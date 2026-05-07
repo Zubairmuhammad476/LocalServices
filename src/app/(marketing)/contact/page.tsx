@@ -12,9 +12,7 @@ const OFFICES = [
 ];
 
 const QUICK_CONTACTS = [
-  { icon: "📧", label: "General Enquiries", value: "hello@localservices.ae", href: "mailto:hello@localservices.ae" },
   { icon: "🛒", label: "Bookings Support", value: "bookings@localservices.ae", href: "mailto:bookings@localservices.ae" },
-  { icon: "🤝", label: "Provider Partnerships", value: "partners@localservices.ae", href: "mailto:partners@localservices.ae" },
   { icon: "⚖️", label: "Legal & Privacy", value: "legal@localservices.ae", href: "mailto:legal@localservices.ae" },
   { icon: "📞", label: "Hotline (24/7)", value: "+971 800 LSV AE", href: "tel:+971800578" },
   { icon: "💬", label: "WhatsApp Support", value: "+971 50 999 8888", href: "https://wa.me/971509998888" },
