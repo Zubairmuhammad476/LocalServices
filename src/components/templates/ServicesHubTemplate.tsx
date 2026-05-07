@@ -5,91 +5,79 @@ import Link from 'next/link';
 import Image from 'next/image';
 import BookingModal from '@/components/ui/BookingModal';
 
-// ── All UAE Services — unique local WebP images, no icons ─────────────────────
+// ── All UAE Services — SEO-optimised descriptions, unique WebP images ─────────
 const ALL_SERVICES = [
   {
     name: 'Home Cleaning',
     slug: 'services/dubai/home-cleaning',
-    price: '149',
     img: '/assets/images/services/home-cleaning.webp',
-    desc: 'Deep-clean your villa or apartment with HEPA vacuums and eco-safe products.',
+    desc: 'Professional home cleaning in Dubai using HEPA-filtered vacuums and eco-safe products. Trained maids sanitize every room to hotel-grade standards — book same-day.',
   },
   {
     name: 'Maid Services',
     slug: 'services/dubai/maid-services',
-    price: '199',
     img: '/assets/images/services/maid-services.webp',
-    desc: 'Trusted, background-checked housekeepers on weekly or monthly plans.',
+    desc: 'Background-checked housekeepers available on weekly or monthly plans across all 7 UAE Emirates. Booking confirmation in under 2 minutes.',
   },
   {
     name: 'AC Maintenance',
     slug: 'services/dubai/ac-maintenance',
-    price: '249',
     img: '/assets/images/services/ac-maintenance.webp',
-    desc: 'Coil cleaning, refrigerant top-up and full system servicing.',
+    desc: 'Certified AC technicians in Dubai for coil cleaning, refrigerant top-ups and full system servicing. Reduce your DEWA bill and breathe cleaner air.',
   },
   {
     name: 'Plumbing',
     slug: 'services/dubai/plumbing',
-    price: '199',
     img: '/assets/images/services/plumbing.webp',
-    desc: 'Fix leaks, unblock drains and replace fittings same-day.',
+    desc: 'Licensed plumbers fix leaks, unblock drains and replace fittings same-day across Dubai and Abu Dhabi. Arrive with all parts — no second visit needed.',
   },
   {
     name: 'Electrical',
     slug: 'services/dubai/electrical',
-    price: '199',
     img: '/assets/images/services/electrical.webp',
-    desc: 'DEWA-approved wiring, fault finding and smart-home installation.',
+    desc: 'DEWA-approved electricians for wiring, fault finding and smart-home installation. Certified, insured and available same-day throughout UAE.',
   },
   {
     name: 'Painting',
     slug: 'services/dubai/painting',
-    price: '349',
     img: '/assets/images/services/painting.webp',
-    desc: 'Interior and exterior painting with premium washable emulsions.',
+    desc: 'Interior and exterior painting with premium washable emulsions. Villa, apartment and commercial projects completed by experienced painters in UAE.',
   },
   {
     name: 'Carpentry',
     slug: 'services/dubai/carpentry',
-    price: '299',
     img: '/assets/images/services/carpentry.webp',
-    desc: 'Custom furniture, kitchen cabinets and precision woodwork.',
+    desc: 'Custom furniture, kitchen cabinets and precision woodwork by skilled carpenters. From IKEA assembly to bespoke joinery — serving Dubai, Abu Dhabi and Sharjah.',
   },
   {
     name: 'Pest Control',
     slug: 'services/dubai/pest-control',
-    price: '299',
     img: '/assets/images/services/pest-control.webp',
-    desc: 'Municipality-approved treatments with 60-day zero-recurrence guarantee.',
+    desc: 'Municipality-approved pest control treatments in Dubai with a 60-day zero-recurrence guarantee. One visit eliminates cockroaches, ants and rodents.',
   },
   {
     name: 'Handyman',
     slug: 'services/dubai/handyman',
-    price: '149',
     img: '/assets/images/services/handyman.webp',
-    desc: 'TV mounting, furniture assembly, curtain fitting and minor repairs.',
+    desc: 'Skilled handymen for TV mounting, furniture assembly, curtain fitting and minor repairs. Fully equipped — arrive on time, every time across UAE.',
   },
   {
     name: 'Landscaping',
     slug: 'services/dubai/landscaping',
-    price: '399',
     img: '/assets/images/services/landscaping.webp',
-    desc: 'Lawn mowing, tree trimming, irrigation and desert-resilient planting.',
+    desc: 'Professional landscaping in UAE — lawn mowing, tree trimming, irrigation setup and desert-resilient planting to keep your garden lush year-round.',
   },
   {
     name: 'Deep Cleaning',
     slug: 'services/dubai/deep-cleaning',
-    price: '249',
     img: '/assets/images/services/deep-cleaning.webp',
-    desc: 'Intensive sanitization of all surfaces, grout, appliances and fixtures.',
+    desc: 'Intensive deep-cleaning of all surfaces, grout, kitchen appliances and bathroom fixtures. Ideal for move-in, move-out or seasonal sanitization in UAE.',
   },
   {
     name: 'Move-In',
     slug: 'services/dubai/move-in',
-    price: '349',
     img: '/assets/images/services/move-in.webp',
-    desc: 'End-to-end relocation assistance — packing, transport and setup.',
+    desc: 'End-to-end relocation assistance across UAE — professional packing, secure transport and full setup in your new home. Stress-free moving guaranteed.',
   },
 ];
 
@@ -230,24 +218,100 @@ export default function ServicesHubTemplate() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
 
-                  {/* Strong bottom gradient for readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-85 group-hover:opacity-90 transition-opacity duration-300" />
+                  {/* Default gradient — lighter at top, strong at bottom */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-transparent opacity-80 group-hover:opacity-0 transition-opacity duration-400" />
 
-                  {/* Text content — bottom aligned, NO icon */}
-                  <div className="absolute inset-x-0 bottom-0 p-5 text-center">
-                    <h3 className="text-[15px] font-extrabold text-white leading-tight mb-1">
+                  {/* Hover overlay — stronger gradient for description readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#002366] via-[#002366]/85 to-[#002366]/60 opacity-0 group-hover:opacity-95 transition-opacity duration-400" />
+
+                  {/* Default state: name + arrow at bottom */}
+                  <div className="absolute inset-x-0 bottom-0 p-5 text-center transition-all duration-400 group-hover:opacity-0 group-hover:translate-y-4">
+                    <h3 className="text-base font-extrabold text-white leading-tight mb-3">
                       {svc.name}
                     </h3>
-                    <p className="text-xs text-blue-300 font-semibold mb-3">
-                      From AED {svc.price}
-                    </p>
-                    {/* Arrow — shows on hover */}
-                    <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20 text-xs group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:scale-110 transition-all duration-300">
+                    <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20 text-xs">
                       →
                     </div>
                   </div>
+
+                  {/* Hover state: name + description + CTA */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-5 text-center opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400">
+                    <h3 className="text-lg font-extrabold text-white leading-tight mb-2">
+                      {svc.name}
+                    </h3>
+                    <p className="text-[13px] leading-relaxed text-blue-100/90 mb-4 max-w-[220px]">
+                      {svc.desc}
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 px-4 py-2 text-xs font-bold text-white">
+                      View Service →
+                    </span>
+                  </div>
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            SEO CONTENT — Image + text side-by-side for search authority
+           ══════════════════════════════════════════════════════════════════ */}
+        <section className="py-20 sm:py-24 bg-[var(--ghost-white)]" aria-label="Why choose LocalServices AE for home services in UAE">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+
+              {/* Image side */}
+              <div className="relative">
+                <div className="relative overflow-hidden rounded-3xl shadow-2xl">
+                  <Image
+                    src="/assets/images/services/why-localservices.png"
+                    alt="LocalServices AE technician consulting with a homeowner inside a modern Dubai apartment"
+                    width={640}
+                    height={480}
+                    className="w-full h-auto object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+                {/* Floating trust badge */}
+                <div className="absolute -bottom-5 -right-3 sm:-right-5 flex items-center gap-3 rounded-2xl bg-white px-5 py-4 shadow-xl border border-slate-100">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-xl">🏛️</div>
+                  <div>
+                    <p className="text-sm font-extrabold text-slate-900">DED Licensed</p>
+                    <p className="text-[11px] text-slate-500">Dubai Economy & Tourism</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text side */}
+              <div>
+                <p className="section-label mb-3">Why LocalServices AE</p>
+                <h2 className="section-h2-dark text-fluid-h2 mb-6">UAE&apos;s Most Trusted Home Service Marketplace</h2>
+                <div className="space-y-4 text-[15px] leading-relaxed text-slate-600">
+                  <p>
+                    LocalServices AE connects homeowners across <strong className="text-slate-900">Dubai, Abu Dhabi, Sharjah</strong> and all 7 UAE Emirates with <strong className="text-slate-900">3,600+ DED-licensed professionals</strong>. Every technician is background-checked, fully insured with AED 10,000 accidental damage coverage, and arrives with all tools and materials — so you never need a second visit.
+                  </p>
+                  <p>
+                    From <strong className="text-slate-900">emergency AC repair</strong> and <strong className="text-slate-900">same-day plumbing</strong> to scheduled deep-cleaning and villa painting, our platform handles bookings in under 2 minutes. Transparent AED pricing means no hidden fees — the quote you see is the price you pay.
+                  </p>
+                  <p>
+                    We serve over <strong className="text-slate-900">80 neighborhoods</strong> including JVC, Palm Jumeirah, Al Reem Island, Mirdif, Saadiyat Island and Downtown Dubai. Whether you need a one-time handyman or a monthly maid plan, our <strong className="text-slate-900">7-day satisfaction guarantee</strong> ensures you are 100% protected.
+                  </p>
+                </div>
+
+                {/* Trust bullets */}
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  {[
+                    { icon: '⏰', text: '60-Min Emergency Response' },
+                    { icon: '🛡️', text: 'AED 10k Damage Cover' },
+                    { icon: '✅', text: 'Background-Checked Pros' },
+                    { icon: '💰', text: 'Transparent AED Pricing' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-center gap-2.5">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-base">{item.icon}</span>
+                      <span className="text-sm font-semibold text-slate-700">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
