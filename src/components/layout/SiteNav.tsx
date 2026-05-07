@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/services/dubai", label: "Services" },
+  { href: "/services", label: "Services" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -49,9 +49,9 @@ export default function SiteNav() {
               href={link.href}
               role="menuitem"
               className={`text-sm font-semibold transition-colors duration-200 ${
-                pathname === link.href ? "text-[var(--brand)]" : "text-[var(--text-muted)] hover:text-[var(--deep-navy)]"
+                (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)) ? "text-[var(--brand)]" : "text-[var(--text-muted)] hover:text-[var(--deep-navy)]"
               }`}
-              aria-current={pathname === link.href ? "page" : undefined}
+              aria-current={(link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)) ? "page" : undefined}
             >
               {link.label}
             </Link>
@@ -122,7 +122,7 @@ export default function SiteNav() {
                 onClick={() => setMenuOpen(false)}
                 role="menuitem"
                 className={`text-sm font-bold py-1 ${
-                  pathname === link.href ? "text-[var(--brand)]" : "text-[var(--text-muted)]"
+                  (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)) ? "text-[var(--brand)]" : "text-[var(--text-muted)]"
                 }`}
               >
                 {link.label}
