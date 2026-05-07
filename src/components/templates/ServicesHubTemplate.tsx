@@ -270,13 +270,13 @@ export default function ServicesHubTemplate() {
                     className="w-full h-auto object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
-                </div>
-                {/* Floating trust badge */}
-                <div className="absolute -bottom-5 -right-3 sm:-right-5 flex items-center gap-3 rounded-2xl bg-white px-5 py-4 shadow-xl border border-slate-100">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-xl">🏛️</div>
-                  <div>
-                    <p className="text-sm font-extrabold text-slate-900">DED Licensed</p>
-                    <p className="text-[11px] text-slate-500">Dubai Economy & Tourism</p>
+                  {/* Glassmorphism DED badge — center bottom of image */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-2xl px-6 py-3.5 shadow-lg border border-white/25 backdrop-blur-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">🏛️</div>
+                    <div>
+                      <p className="text-sm font-extrabold text-white">DED Licensed</p>
+                      <p className="text-[11px] text-white/70">Dubai Economy & Tourism</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -372,6 +372,70 @@ export default function ServicesHubTemplate() {
               Book a Service Now
             </button>
             <p className="mt-6 text-blue-200/50 text-sm">🔒 No credit card required · AED payments · 100% satisfaction guaranteed</p>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            FAQ — Service-related questions for SEO & user trust
+           ══════════════════════════════════════════════════════════════════ */}
+        <section className="py-20 sm:py-24 bg-[var(--ghost-white)]" aria-label="Frequently asked questions about home services in UAE">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="section-label">Got Questions?</p>
+              <h2 className="section-h2-dark mt-3 text-fluid-h2">Frequently Asked Questions</h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm" style={{ color: '#64748B' }}>
+                Everything you need to know before booking a home service in the UAE.
+              </p>
+            </div>
+            <div className="mt-12 space-y-3">
+              {[
+                {
+                  q: 'What home services do you offer in Dubai and Abu Dhabi?',
+                  a: 'We offer 12+ professional home services including AC maintenance, home cleaning, plumbing, electrical, painting, pest control, carpentry, landscaping, maid services, deep cleaning, handyman and move-in assistance. All services are available across Dubai, Abu Dhabi, Sharjah and all 7 UAE Emirates.',
+                },
+                {
+                  q: 'How quickly can a technician arrive at my home?',
+                  a: 'For emergency services such as AC repair or plumbing, we guarantee arrival within 60 minutes across Dubai and Abu Dhabi. Standard bookings can be scheduled same-day or for the next available morning slot at your preferred time.',
+                },
+                {
+                  q: 'Are your service providers licensed and insured?',
+                  a: 'Yes. Every professional on our platform holds a valid UAE trade licence and is fully insured. We carry AED 10,000 accidental damage coverage per booking. All credentials are verified before onboarding, including DED licence checks and background screening.',
+                },
+                {
+                  q: 'How does pricing work — are there hidden fees?',
+                  a: 'We operate on a transparent AED pricing model. The quote you receive is the price you pay — no hidden charges, no surge pricing, and no call-out fees. You can view service rates before confirming your booking.',
+                },
+                {
+                  q: 'Can I book a service for the same day?',
+                  a: 'Absolutely. Most of our services offer same-day availability. Simply select your preferred time slot when booking and receive confirmation within 2 minutes. Emergency services like plumbing and electrical are dispatched immediately.',
+                },
+                {
+                  q: 'What happens if I am not satisfied with the service?',
+                  a: 'We offer a 7-day satisfaction guarantee on every booking. If you are not 100% satisfied, we will arrange a complimentary re-service or issue a full refund. Your payment is held in escrow until you confirm the job is complete.',
+                },
+                {
+                  q: 'Do I need to provide tools or cleaning supplies?',
+                  a: 'No. Our professionals arrive fully equipped with all necessary tools, equipment and industry-grade consumables. For specialty requirements such as specific paint brands, we will advise you in advance so you can approve the materials.',
+                },
+                {
+                  q: 'Which areas in the UAE do you cover?',
+                  a: 'We operate in all 7 Emirates: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah and Umm Al Quwain. Coverage includes over 80 neighborhoods such as JVC, Palm Jumeirah, Al Reem Island, Mirdif, Saadiyat Island, Downtown Dubai, Al Nahda and more.',
+                },
+              ].map((faq, i) => (
+                <details
+                  key={faq.q}
+                  className="faq-item"
+                >
+                  <summary className="faq-summary">
+                    <span>{faq.q}</span>
+                    <svg className="faq-chevron" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                    </svg>
+                  </summary>
+                  <div className="faq-body">{faq.a}</div>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
