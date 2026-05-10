@@ -1890,7 +1890,7 @@ p, li, td, th, label, input, select, textarea, button, a {
    --------------------------------------------------------------------------- */
 .hero-v2-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 85vh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -2121,8 +2121,8 @@ p, li, td, th, label, input, select, textarea, button, a {
   text-align: center;
   grid-template-columns: unset;
   max-width: 72rem;
-  padding-top: 5rem;
-  padding-bottom: 4rem;
+  padding-top: 4rem;
+  padding-bottom: 3rem;
   gap: 1.25rem;
 }
 

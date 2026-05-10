@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { generateSeoMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = generateSeoMetadata({
@@ -88,43 +89,46 @@ export default function AboutPage() {
     <div className="overflow-x-hidden">
       {/* Hero */}
       <section
-        className="relative overflow-hidden py-28"
+        className="relative overflow-hidden py-20"
         style={{ background: "#081226" }}
         aria-label="About LocalServices AE"
       >
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/assets/images/about-hero.png"
+            alt="Professional home services in UAE"
+            className="h-full w-full object-cover opacity-30"
+            fill
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#081226]/80 via-[#081226]/60 to-[#081226]" />
+        </div>
+
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,98,255,0.2)_0%,transparent_65%)]" />
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
+        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6">
           <span className="inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-900/20 px-4 py-1.5 text-xs font-semibold text-blue-300">
             🇦🇪 Proudly UAE-Built
           </span>
-          <h1 className="mt-7 text-5xl font-extrabold leading-tight text-white sm:text-6xl font-display">
+          <h1 className="mt-6 text-4xl font-extrabold leading-tight text-white sm:text-5xl font-display">
             LocalServices AE Connects UAE Homes With{" "}
             <span className="gradient-text">Trusted Professionals</span>
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-slate-300">
-            <strong>LocalServices AE facilitates home maintenance logistics</strong> for UAE homeowners. The platform optimizes service delivery by connecting users with highly-skilled specialists, such as HVAC engineers and master plumbers, across all 7 UAE emirates.
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300">
+            <strong>LocalServices AE facilitates home maintenance logistics</strong> for UAE homeowners. The platform optimizes service delivery by connecting users with highly-skilled specialists across all 7 UAE emirates.
           </p>
-        </div>
-      </section>
 
-      {/* Stats */}
-      <section
-        className="border-y py-12"
-        style={{ background: "linear-gradient(90deg, rgba(13,21,48,0.5) 0%, rgba(10,22,40,0.5) 100%)", borderColor: "rgba(0,98,255,0.12)" }}
-        aria-label="LocalServices AE platform statistics"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          {/* Integrated Stats */}
+          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 border-t border-white/10 pt-8">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center" role="figure" aria-label={`${stat.value} ${stat.label}`}>
-                <div className="text-3xl" aria-hidden="true">{stat.icon}</div>
-                <p className="mt-2 text-4xl font-extrabold text-white font-display">{stat.value}</p>
-                <p className="mt-1 text-sm text-slate-400">{stat.label}</p>
+                <p className="text-2xl font-extrabold text-white font-display">{stat.value}</p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wider font-semibold text-blue-400/80">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+
 
       {/* Story */}
       <section className="section-ghost py-24 sm:py-28" aria-label="The LocalServices AE founding story">
