@@ -156,7 +156,7 @@ export default function CustomerPortal() {
                     Ready for Your Next Service?
                   </h2>
                   <p className="relative mt-2 text-sm text-blue-200">Browse 3,619+ verified services across all UAE emirates.</p>
-                  <a href="/services/dubai" className="relative mt-4 inline-block btn-primary px-6 py-2.5 text-sm">
+                  <a href="/services" className="relative mt-4 inline-block btn-primary px-6 py-2.5 text-sm">
                     Browse Services →
                   </a>
                 </div>
@@ -206,7 +206,7 @@ export default function CustomerPortal() {
                     <p className="text-4xl">📭</p>
                     <p className="mt-3 text-base font-medium text-white">No active bookings</p>
                     <p className="mt-1 text-sm text-slate-400">Ready to book your first service?</p>
-                    <a href="/services/dubai" className="mt-4 inline-block btn-primary px-6 py-2.5 text-sm">Browse Services</a>
+                    <a href="/services" className="mt-4 inline-block btn-primary px-6 py-2.5 text-sm">Browse Services</a>
                   </div>
                 ) : (
                   activeBookings.map((booking) => (
