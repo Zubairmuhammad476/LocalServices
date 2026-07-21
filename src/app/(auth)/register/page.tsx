@@ -47,10 +47,17 @@ function RegisterContent() {
       await handleRegister({ ...form, role });
       const destination = role === "provider" ? "/provider" : "/customer";
       router.push(destination);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Registration failed. Please try again.";
-      setError(message);
+    } catch (err: any) {
+      if (err.response?.data?.errors) {
+        // Extract validation errors from Laravel response
+        const errorMessages = Object.values(err.response.data.errors).flat();
+        setError(errorMessages.join("\n"));
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        const message = err instanceof Error ? err.message : "Registration failed. Please try again.";
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -158,9 +165,10 @@ function RegisterContent() {
                   required
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="Min. 8 characters"
+                  placeholder="e.g. SecurePass123!"
                   className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
+                <p className="text-[10px] text-slate-500 mt-1.5 ml-1">Must be at least 8 chars, 1 letter, and 1 number.</p>
               </div>
 
               <div>
@@ -179,9 +187,12 @@ function RegisterContent() {
             </div>
 
             {error && (
-              <div className="rounded-xl bg-red-900/20 border border-red-500/30 p-3.5 flex gap-3">
-                <span className="text-red-400 shrink-0">⚠</span>
-                <p className="text-xs text-red-300">{error}</p>
+              <div className="rounded-xl bg-red-900/20 border border-red-500/30 p-3.5 flex flex-col gap-1">
+                <div className="flex gap-2 items-center">
+                   <span className="text-red-400 shrink-0">⚠</span>
+                   <p className="text-xs font-semibold text-red-300">Registration Failed</p>
+                </div>
+                <p className="text-xs text-red-200/80 ml-6 whitespace-pre-line">{error}</p>
               </div>
             )}
 
