@@ -9,7 +9,7 @@ import type {
 // ─── Axios Client ─────────────────────────────────────────────────────────────
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "https://slateblue-dinosaur-365398.hostingersite.com/api",
   // withCredentials omitted — we use Bearer token auth, not Sanctum cookie sessions
   headers: {
     Accept: "application/json",
