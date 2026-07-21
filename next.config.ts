@@ -62,7 +62,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://ik.imagekit.io https://images.pexels.com https://res.cloudinary.com",
-              "connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://darkviolet-pony-419059.hostingersite.com https://ik.imagekit.io https://upload.imagekit.io",
+              "connect-src 'self' http://localhost:8000 http://127.0.0.1:8000 https://slateblue-dinosaur-365398.hostingersite.com https://ik.imagekit.io https://upload.imagekit.io",
               "frame-ancestors 'none'",
             ].join("; "),
           },
