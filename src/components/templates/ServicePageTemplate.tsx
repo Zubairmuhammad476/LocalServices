@@ -25,8 +25,7 @@ const LOCATION_HERO: Record<string, string> = {
 const SERVICE_CARD_IMAGES: Record<string, string> = {
   'cleaning':       '/assets/images/services/home-cleaning.webp',
   'home-cleaning':  '/assets/images/services/home-cleaning.webp',
-  'maid':           '/assets/images/services/maid-services.webp',
-  'maid-services':  '/assets/images/services/maid-services.webp',
+
   'ac':             '/assets/images/services/ac-maintenance.webp',
   'ac-maintenance': '/assets/images/services/ac-maintenance.webp',
   'plumbing':       '/assets/images/services/plumbing.webp',

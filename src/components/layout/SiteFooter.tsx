@@ -25,7 +25,7 @@ export default function SiteFooter() {
       { label: "AC Maintenance",  href: "/services/dubai/ac-maintenance" },
       { label: "Plumbing",        href: "/services/dubai/plumbing" },
       { label: "Electrical",      href: "/services/dubai/electrical" },
-      { label: "Maid Services",   href: "/services/dubai/maid-services" },
+      { label: "Handyman",        href: "/services/dubai/handyman" },
       { label: "Pest Control",    href: "/services/dubai/pest-control" },
     ],
     Legal: [
@@ -59,7 +59,7 @@ export default function SiteFooter() {
         { label: "AC Repair Abu Dhabi",     href: "/services/abu-dhabi/ac-maintenance" },
         { label: "Cleaning Abu Dhabi",      href: "/services/abu-dhabi/home-cleaning" },
         { label: "Plumbing Abu Dhabi",      href: "/services/abu-dhabi/plumbing" },
-        { label: "Maid Services Abu Dhabi", href: "/services/abu-dhabi/maid-services" },
+        { label: "Handyman Abu Dhabi",      href: "/services/abu-dhabi/handyman" },
         { label: "Pest Control Abu Dhabi",  href: "/services/abu-dhabi/pest-control" },
       ],
     },
@@ -141,7 +141,7 @@ export default function SiteFooter() {
                 </span>
               </Link>
               <p className="mt-6 text-sm font-light leading-relaxed text-slate-300 max-w-sm">
-                Experience seamless, verified home services at your fingertips. From premium maid services to certified deep AC maintenance across all 7 UAE emirates.
+                Experience seamless, verified home services at your fingertips. From certified AC maintenance to expert plumbing and electrical services across all 7 UAE emirates.
               </p>
               
               {/* Trust badges */}

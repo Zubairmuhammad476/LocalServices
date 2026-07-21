@@ -7,14 +7,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 /* ------------------------------------------------------------------ */
 const SERVICES = [
   'AC Repair', 'AC Installation', 'AC Duct Cleaning', 'AC Gas Refill',
-  'Home Deep Cleaning', 'Regular Home Cleaning', 'Maid Services', 'Carpet Cleaning',
+  'Home Deep Cleaning', 'Regular Home Cleaning', 'Carpet Cleaning',
   'Plumbing', 'Pipe Leak Fix', 'Drain Unblocking', 'Water Heater Repair',
   'Electrical', 'DEWA Wiring', 'Electrical Fault Finding', 'Light Installation',
   'Handyman', 'Furniture Assembly', 'TV Wall Mounting', 'Curtain Fitting',
   'Pest Control', 'Cockroach Control', 'Termite Treatment', 'Bed Bug Removal',
   'Landscaping', 'Garden Maintenance', 'Artificial Grass', 'Tree Trimming',
   'Painting', 'Interior Painting', 'Exterior Painting', 'Wallpaper Fixing',
-  'Appliance Repair', 'Washing Machine Repair', 'Fridge Repair', 'Oven Repair',
+  'Carpentry', 'Pool Services', 'Renovation', 'Waterproofing',
 ];
 
 const LOCATIONS = [

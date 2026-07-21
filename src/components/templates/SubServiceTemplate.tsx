@@ -16,7 +16,7 @@ const SERVICE_HERO_IMAGES: Record<string, string> = {
   'ac-repair':       '/assets/images/services/ac-maintenance.webp',
   'home-cleaning':   '/assets/images/services/home-cleaning.webp',
   'deep-cleaning':   '/assets/images/services/deep-cleaning.webp',
-  'maid-services':   '/assets/images/services/maid-services.webp',
+
   'plumbing':        '/assets/images/services/plumbing.webp',
   'electrical':      '/assets/images/services/electrical.webp',
   'painting':        '/assets/images/services/painting.webp',
@@ -24,7 +24,7 @@ const SERVICE_HERO_IMAGES: Record<string, string> = {
   'pest-control':    '/assets/images/services/pest-control.webp',
   'handyman':        '/assets/images/services/handyman.webp',
   'landscaping':     '/assets/images/services/landscaping.webp',
-  'move-in':         '/assets/images/services/move-in.webp',
+
 };
 
 function getServiceHero(slug: string): string {
@@ -40,7 +40,7 @@ const SERVICE_INCLUDED: Record<string, { items: string[]; heading: string; descr
   'ac-maintenance': { heading: 'Complete AC Care Package', description: 'Our AC maintenance service covers every aspect of your cooling system — from deep filter cleaning to refrigerant level checks — ensuring peak performance year-round in the UAE heat.', items: ['Deep Filter Cleaning & Sanitization', 'Refrigerant Gas Level Check', 'Thermostat Calibration', 'Drainage Line Flush', 'Compressor Health Inspection', 'Full System Performance Report'] },
   'home-cleaning': { heading: 'Thorough Home Cleaning Package', description: 'Our professional home cleaning service covers every room with hospital-grade products and systematic techniques, leaving your home spotless and fresh.', items: ['All Rooms Dusted & Vacuumed', 'Kitchen Deep Clean & Degrease', 'Bathroom Sanitization', 'Floor Mopping & Polishing', 'Window & Mirror Cleaning', 'Trash Removal & Bin Sanitization'] },
   'deep-cleaning': { heading: 'Intensive Deep Clean Package', description: 'Go beyond surface cleaning with our deep cleaning service — we tackle hidden grime, stubborn stains, and hard-to-reach areas for a truly refreshed home.', items: ['Behind-Appliance Cleaning', 'Grout & Tile Scrubbing', 'Upholstery Vacuuming', 'Cabinet Interior Wipe-Down', 'Light Fixture Cleaning', 'Baseboard & Vent Cleaning'] },
-  'maid-services': { heading: 'Professional Maid Service Package', description: 'Reliable, trained maids handle your daily or weekly cleaning needs with care, consistency, and attention to detail — so you can focus on what matters.', items: ['Daily / Weekly Scheduling', 'Laundry & Ironing', 'Kitchen & Bathroom Upkeep', 'Bed Making & Linen Change', 'Surface Dusting & Organization', 'Eco-Friendly Cleaning Products'] },
+
   'plumbing': { heading: 'Expert Plumbing Service Package', description: 'From leaky faucets to full pipe replacements, our licensed plumbers diagnose and fix issues fast with guaranteed workmanship.', items: ['Leak Detection & Repair', 'Pipe Installation & Replacement', 'Drain Unblocking', 'Water Heater Service', 'Fixture Installation', 'Emergency Plumbing Support'] },
   'electrical': { heading: 'Certified Electrical Service Package', description: 'Our municipality-approved electricians handle installations, repairs, and safety inspections with precision and full compliance.', items: ['Wiring & Rewiring', 'Switch & Socket Installation', 'Circuit Breaker Repair', 'Lighting Installation', 'Electrical Safety Inspection', 'Fan & Fixture Mounting'] },
   'painting': { heading: 'Premium Painting Service Package', description: 'Transform your space with our professional painting service — clean prep work, premium paints, and flawless finishes guaranteed.', items: ['Wall Preparation & Priming', 'Interior & Exterior Painting', 'Accent Wall Design', 'Ceiling & Trim Painting', 'Color Consultation', 'Post-Paint Cleanup'] },
@@ -48,7 +48,7 @@ const SERVICE_INCLUDED: Record<string, { items: string[]; heading: string; descr
   'pest-control': { heading: 'Complete Pest Control Package', description: 'Municipality-approved pest control solutions that eliminate infestations and prevent recurrence — safe for families and pets.', items: ['Full Property Inspection', 'Targeted Treatment Plan', 'Cockroach & Ant Control', 'Bed Bug Elimination', 'Rodent Prevention', 'Follow-Up Inspection'] },
   'handyman': { heading: 'All-In-One Handyman Package', description: 'One call covers it all — our versatile handymen tackle everything from minor repairs to home improvement projects.', items: ['Furniture Assembly & Repair', 'Wall Mounting & Drilling', 'Minor Plumbing & Electrical', 'Door & Lock Repair', 'Caulking & Sealing', 'General Home Repairs'] },
   'landscaping': { heading: 'Professional Landscaping Package', description: 'Create and maintain beautiful outdoor spaces with our expert landscaping team — from garden design to regular upkeep.', items: ['Garden Design & Planning', 'Lawn Mowing & Edging', 'Tree & Hedge Trimming', 'Irrigation System Setup', 'Outdoor Lighting', 'Seasonal Planting'] },
-  'move-in': { heading: 'Move-In Ready Service Package', description: 'Moving into a new place? We ensure your new home is spotless, sanitized, and ready for you from day one.', items: ['Full Property Sanitization', 'Kitchen & Appliance Cleaning', 'Bathroom Deep Scrub', 'Carpet & Floor Treatment', 'AC Filter Cleaning', 'Window & Balcony Wash'] },
+
 };
 
 // ── 4 Key Features per service ────────────────────────────────────────────────
@@ -72,12 +72,7 @@ const SERVICE_KEY_FEATURES: Record<string, KeyFeature[]> = {
     { icon: '💎', title: 'Surface Restoration', description: 'Grout scrubbing, tile polishing, and stain removal that restores your surfaces to their original shine.' },
     { icon: '📅', title: 'Seasonal Refresh', description: 'Perfect for move-in/move-out, post-renovation, or quarterly deep cleaning to maintain a healthy home.' },
   ],
-  'maid-services': [
-    { icon: '👩‍🏫', title: 'Trained & Vetted Staff', description: 'Every maid undergoes rigorous training and background checks for your complete peace of mind.' },
-    { icon: '🔄', title: 'Consistent Quality', description: 'Same dedicated maid for recurring bookings ensures familiarity with your home and preferences.' },
-    { icon: '📱', title: 'Easy Management', description: 'Reschedule, pause, or modify your plan anytime through our platform — total flexibility guaranteed.' },
-    { icon: '🏆', title: 'Premium Standards', description: 'Our maids follow hotel-grade cleaning standards using professional equipment and products.' },
-  ],
+
   'plumbing': [
     { icon: '🔧', title: 'Expert Diagnostics', description: 'Advanced leak detection technology pinpoints problems fast, minimizing unnecessary wall or floor damage.' },
     { icon: '⚡', title: 'Rapid Response', description: 'Emergency plumbing available 24/7 — our licensed plumbers can reach you within 60 minutes.' },
@@ -120,12 +115,7 @@ const SERVICE_KEY_FEATURES: Record<string, KeyFeature[]> = {
     { icon: '🌸', title: 'Native Plant Expertise', description: 'We select heat-resistant, low-maintenance plants that thrive in the UAE\'s arid conditions.' },
     { icon: '🔄', title: 'Maintenance Plans', description: 'Regular upkeep packages including mowing, trimming, fertilizing, and seasonal planting rotations.' },
   ],
-  'move-in': [
-    { icon: '🏠', title: 'Move-In Ready', description: 'We transform any property into a spotless, sanitized space that\'s ready for you from day one.' },
-    { icon: '🧹', title: 'Post-Construction Clean', description: 'Specialized cleaning for newly built or renovated properties — removing dust, debris, and residue.' },
-    { icon: '✅', title: 'Landlord Approved', description: 'Our move-out cleaning meets property management standards to help secure your deposit refund.' },
-    { icon: '📸', title: 'Before & After Photos', description: 'Full photographic documentation of the cleaning for your records and landlord requirements.' },
-  ],
+
 };
 
 function getKeyFeatures(slug: string): KeyFeature[] {

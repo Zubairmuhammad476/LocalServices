@@ -8,7 +8,7 @@ const POPULAR_SERVICES = [
   { name: 'Home Cleaning',   slug: 'home-cleaning',   icon: '🧹' },
   { name: 'Plumbing',        slug: 'plumbing',        icon: '🔧' },
   { name: 'Electrical',      slug: 'electrical',      icon: '⚡' },
-  { name: 'Maid Services',   slug: 'maid-services',   icon: '🏠' },
+  { name: 'Painting',        slug: 'painting',        icon: '🎨' },
   { name: 'Pest Control',    slug: 'pest-control',    icon: '🛡️' },
   { name: 'Handyman',        slug: 'handyman',        icon: '🛠️' },
   { name: 'Landscaping',     slug: 'landscaping',     icon: '🌿' },

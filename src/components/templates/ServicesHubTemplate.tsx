@@ -13,12 +13,7 @@ const ALL_SERVICES = [
     img: '/assets/images/services/home-cleaning.webp',
     desc: 'Professional home cleaning in Dubai using HEPA-filtered vacuums and eco-safe products. Trained maids sanitize every room to hotel-grade standards — book same-day.',
   },
-  {
-    name: 'Maid Services',
-    slug: 'services/dubai/maid-services',
-    img: '/assets/images/services/maid-services.webp',
-    desc: 'Background-checked housekeepers available on weekly or monthly plans across all 7 UAE Emirates. Booking confirmation in under 2 minutes.',
-  },
+
   {
     name: 'AC Maintenance',
     slug: 'services/dubai/ac-maintenance',
@@ -73,12 +68,7 @@ const ALL_SERVICES = [
     img: '/assets/images/services/deep-cleaning.webp',
     desc: 'Intensive deep-cleaning of all surfaces, grout, kitchen appliances and bathroom fixtures. Ideal for move-in, move-out or seasonal sanitization in UAE.',
   },
-  {
-    name: 'Move-In',
-    slug: 'services/dubai/move-in',
-    img: '/assets/images/services/move-in.webp',
-    desc: 'End-to-end relocation assistance across UAE — professional packing, secure transport and full setup in your new home. Stress-free moving guaranteed.',
-  },
+
 ];
 
 // ── Emirates — each with its own photorealistic background image ───────────────
@@ -293,7 +283,7 @@ export default function ServicesHubTemplate() {
                     From <strong className="text-slate-900">emergency AC repair</strong> and <strong className="text-slate-900">same-day plumbing</strong> to scheduled deep-cleaning and villa painting, our platform handles bookings in under 2 minutes. Transparent AED pricing means no hidden fees — the quote you see is the price you pay.
                   </p>
                   <p>
-                    We serve over <strong className="text-slate-900">80 neighborhoods</strong> including JVC, Palm Jumeirah, Al Reem Island, Mirdif, Saadiyat Island and Downtown Dubai. Whether you need a one-time handyman or a monthly maid plan, our <strong className="text-slate-900">7-day satisfaction guarantee</strong> ensures you are 100% protected.
+                    We serve over <strong className="text-slate-900">80 neighborhoods</strong> including JVC, Palm Jumeirah, Al Reem Island, Mirdif, Saadiyat Island and Downtown Dubai. Whether you need a one-time handyman or recurring deep cleaning, our <strong className="text-slate-900">7-day satisfaction guarantee</strong> ensures you are 100% protected.
                   </p>
                 </div>
 
@@ -391,7 +381,7 @@ export default function ServicesHubTemplate() {
               {[
                 {
                   q: 'What home services do you offer in Dubai and Abu Dhabi?',
-                  a: 'We offer 12+ professional home services including AC maintenance, home cleaning, plumbing, electrical, painting, pest control, carpentry, landscaping, maid services, deep cleaning, handyman and move-in assistance. All services are available across Dubai, Abu Dhabi, Sharjah and all 7 UAE Emirates.',
+                  a: 'We offer 13 professional home services including AC maintenance, home cleaning, deep cleaning, plumbing, electrical, painting, carpentry, pest control, landscaping, pool services, renovation, waterproofing, glass & aluminum, and handyman services. All services are available across Dubai, Abu Dhabi, Sharjah and all 7 UAE Emirates.',
                 },
                 {
                   q: 'How quickly can a technician arrive at my home?',

@@ -8,7 +8,6 @@ const SERVICES = [
   'AC Cleaning',
   'Home Cleaning',
   'Deep Cleaning',
-  'Maid Services',
   'Plumbing',
   'Electrical',
   'Handyman',
@@ -16,7 +15,10 @@ const SERVICES = [
   'Landscaping',
   'Painting',
   'Carpentry',
-  'Appliance Repair',
+  'Pool Services',
+  'Renovation',
+  'Waterproofing',
+  'Glass & Aluminum',
   'Water Tank Cleaning',
 ];
 

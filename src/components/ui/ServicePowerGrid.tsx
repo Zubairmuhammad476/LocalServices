@@ -19,7 +19,7 @@ const IMAGE_MAP: Record<string, string> = {
   'ac-maintenance':  '/assets/images/services/ac-maintenance.webp',
   'plumbing':        '/assets/images/services/plumbing.webp',
   'electrical':      '/assets/images/services/electrical.webp',
-  'maid-services':   '/assets/images/services/maid-services.webp',
+  'painting':        '/assets/images/services/painting.webp',
   'pest-control':    '/assets/images/services/pest-control.webp',
   'handyman':        '/assets/images/services/handyman.webp',
   'landscaping':     '/assets/images/services/landscaping.webp',

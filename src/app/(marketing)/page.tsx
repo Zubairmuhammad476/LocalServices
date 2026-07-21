@@ -37,8 +37,7 @@ const FEATURED_SERVICES = [
     desc: "Fix leaks, unblock drains, and replace fittings same-day. Our licensed plumbers arrive with parts — no second visit required." },
   { name: "Electrical",      slug: "electrical",      icon: "⚡", bookings: "5,400+",  altTag: "DEWA-approved electrician installing wiring in Sharjah apartment, UAE",
     desc: "DEWA-approved wiring, fault finding, and smart-home installation. All work is certified and insured for your complete peace of mind." },
-  { name: "Maid Services",   slug: "maid-services",   icon: "🏠", bookings: "9,800+",  altTag: "Background-checked maid providing housekeeping in Dubai villa, UAE",
-    desc: "Trusted, background-checked housekeepers on a weekly or monthly plan. Book in 2 minutes and confirm in under 2 minutes." },
+
   { name: "Pest Control",    slug: "pest-control",    icon: "🛡️", bookings: "4,200+",  altTag: "Municipality-approved pest control specialist treating Dubai apartment, UAE",
     desc: "Municipality-approved treatments that eliminate pests in one visit. Zero-recurrence guarantee within 60 days — or we return free." },
   { name: "Handyman",        slug: "handyman",        icon: "🛠️", bookings: "7,600+",  altTag: "Handyman assembling IKEA furniture in Dubai apartment, UAE",
@@ -73,11 +72,7 @@ const TESTIMONIALS = [
     text: "Electrical installation was completed by a DEWA-approved engineer in 4 hours. All certification documents were provided on the same day. Highly recommended.",
     initials: "MQ", color: "from-amber-500 to-orange-500",
   },
-  {
-    name: "Priya Nair", emirate: "Al Nahda, Sharjah", service: "Maid Services", rating: 5,
-    text: "Maid Services provides a background-checked professional every Tuesday. Booking confirmation occurs in under 2 minutes. My home has never been this clean.",
-    initials: "PN", color: "from-green-600 to-teal-500",
-  },
+
 ];
 
 const FAQ_ITEMS = [
@@ -109,7 +104,7 @@ const SEO_SERVICES = [
   { label: "Plumbing Dubai",          href: "/services/dubai/plumbing" },
   { label: "Handyman Sharjah",        href: "/services/sharjah/handyman" },
   { label: "Electrical Dubai",        href: "/services/dubai/electrical" },
-  { label: "Maid Services Abu Dhabi", href: "/services/abu-dhabi/maid-services" },
+
   { label: "Pest Control Dubai",      href: "/services/dubai/pest-control" },
   { label: "Landscaping Sharjah",     href: "/services/sharjah/landscaping" },
 ];

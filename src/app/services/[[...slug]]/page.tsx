@@ -115,17 +115,18 @@ function buildFallback(slugArray: string[]): import('@/lib/server/fetchService')
 
   const CITY_SERVICES = [
     { id: 101, name: 'Home Cleaning',  slug: `services/${location}/home-cleaning`,  base_price: '149', design_layout: 'sub_service_layout', image_url: null },
-    { id: 102, name: 'Maid Services',  slug: `services/${location}/maid-services`,  base_price: '199', design_layout: 'sub_service_layout', image_url: null },
-    { id: 103, name: 'AC Maintenance', slug: `services/${location}/ac-maintenance`, base_price: '249', design_layout: 'sub_service_layout', image_url: null },
-    { id: 104, name: 'Plumbing',       slug: `services/${location}/plumbing`,       base_price: '199', design_layout: 'sub_service_layout', image_url: null },
-    { id: 105, name: 'Electrical',     slug: `services/${location}/electrical`,     base_price: '199', design_layout: 'sub_service_layout', image_url: null },
-    { id: 106, name: 'Painting',       slug: `services/${location}/painting`,       base_price: '349', design_layout: 'sub_service_layout', image_url: null },
-    { id: 107, name: 'Carpentry',      slug: `services/${location}/carpentry`,      base_price: '299', design_layout: 'sub_service_layout', image_url: null },
-    { id: 108, name: 'Pest Control',   slug: `services/${location}/pest-control`,   base_price: '299', design_layout: 'sub_service_layout', image_url: null },
-    { id: 109, name: 'Handyman',       slug: `services/${location}/handyman`,       base_price: '149', design_layout: 'sub_service_layout', image_url: null },
-    { id: 110, name: 'Landscaping',    slug: `services/${location}/landscaping`,    base_price: '399', design_layout: 'sub_service_layout', image_url: null },
-    { id: 111, name: 'Deep Cleaning',  slug: `services/${location}/deep-cleaning`,  base_price: '249', design_layout: 'sub_service_layout', image_url: null },
-    { id: 112, name: 'Move-In',        slug: `services/${location}/move-in`,        base_price: '349', design_layout: 'sub_service_layout', image_url: null },
+    { id: 102, name: 'AC Maintenance', slug: `services/${location}/ac-maintenance`, base_price: '249', design_layout: 'sub_service_layout', image_url: null },
+    { id: 103, name: 'Plumbing',       slug: `services/${location}/plumbing`,       base_price: '199', design_layout: 'sub_service_layout', image_url: null },
+    { id: 104, name: 'Electrical',     slug: `services/${location}/electrical`,     base_price: '199', design_layout: 'sub_service_layout', image_url: null },
+    { id: 105, name: 'Painting',       slug: `services/${location}/painting`,       base_price: '349', design_layout: 'sub_service_layout', image_url: null },
+    { id: 106, name: 'Carpentry',      slug: `services/${location}/carpentry`,      base_price: '299', design_layout: 'sub_service_layout', image_url: null },
+    { id: 107, name: 'Pest Control',   slug: `services/${location}/pest-control`,   base_price: '299', design_layout: 'sub_service_layout', image_url: null },
+    { id: 108, name: 'Handyman',       slug: `services/${location}/handyman`,       base_price: '149', design_layout: 'sub_service_layout', image_url: null },
+    { id: 109, name: 'Landscaping',    slug: `services/${location}/landscaping`,    base_price: '399', design_layout: 'sub_service_layout', image_url: null },
+    { id: 110, name: 'Deep Cleaning',  slug: `services/${location}/deep-cleaning`,  base_price: '249', design_layout: 'sub_service_layout', image_url: null },
+    { id: 111, name: 'Pool Services',  slug: `services/${location}/pool`,           base_price: '299', design_layout: 'sub_service_layout', image_url: null },
+    { id: 112, name: 'Renovation',     slug: `services/${location}/renovation`,     base_price: '499', design_layout: 'sub_service_layout', image_url: null },
+    { id: 113, name: 'Waterproofing',  slug: `services/${location}/waterproofing`,  base_price: '349', design_layout: 'sub_service_layout', image_url: null },
   ];
 
   return {

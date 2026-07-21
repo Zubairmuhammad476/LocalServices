@@ -221,7 +221,7 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
                   <option value="" style={{ background: '#1C5297' }}>Select a service...</option>
                   {[
                     'Home Cleaning',
-                    'Maid Services',
+                    'Deep Cleaning',
                     'AC Maintenance',
                     'Plumbing',
                     'Electrical',
@@ -229,7 +229,11 @@ export default function BookingModal({ isOpen, onClose, serviceName, location = 
                     'Carpentry',
                     'Pest Control',
                     'Handyman',
-                    'Deep Cleaning',
+                    'Landscaping',
+                    'Pool Services',
+                    'Renovation',
+                    'Waterproofing',
+                    'Glass & Aluminum',
                     'Other',
                   ].map((s) => (
                     <option key={s} value={s} style={{ background: '#1C5297' }}>{s}</option>
